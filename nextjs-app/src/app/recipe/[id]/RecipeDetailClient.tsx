@@ -55,11 +55,14 @@ export default function RecipeDetailClient({
               src={recipe.photo_url}
               alt={recipe.name}
               onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
+                const img = e.target as HTMLImageElement;
+                img.style.display = 'none';
+                const placeholder = img.nextElementSibling as HTMLElement;
+                if (placeholder) placeholder.style.display = 'block';
               }}
             />
           ) : null}
-          <span className={styles.placeholderIcon}>&#127858;</span>
+          {!recipe.photo_url && <span className={styles.placeholderIcon}>&#127858;</span>}
         </div>
 
         <div className={styles.content}>
