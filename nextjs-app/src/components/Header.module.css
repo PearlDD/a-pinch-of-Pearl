@@ -1,0 +1,126 @@
+.header {
+  background: linear-gradient(135deg, var(--soft-peach) 0%, var(--warm-cream) 100%);
+  border-bottom: 2px solid var(--border-warm);
+  padding: 1.5rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.headerInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--dark-brown);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.logo span { color: var(--accent-terracotta); }
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  background: var(--soft-white);
+  border: 1px solid var(--border-warm);
+  border-radius: 50px;
+  padding: 0.4rem 1rem;
+  width: 300px;
+  transition: box-shadow 0.3s;
+}
+
+.searchBar:focus-within {
+  box-shadow: 0 0 0 3px rgba(198, 125, 74, 0.2);
+}
+
+.searchBar input {
+  border: none;
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  outline: none;
+  width: 100%;
+  padding: 0.3rem 0.5rem;
+}
+
+.searchBar input::placeholder { color: var(--text-light); }
+
+.searchIcon {
+  color: var(--text-light);
+  font-size: 1rem;
+}
+
+.nav {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.nav button {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-warm);
+  border-radius: 25px;
+  background: var(--soft-white);
+  color: var(--text-medium);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav button:hover,
+.active {
+  background: var(--accent-terracotta) !important;
+  color: white !important;
+  border-color: var(--accent-terracotta) !important;
+}
+
+.favBtn {
+  border-color: var(--accent-sage) !important;
+  color: var(--accent-sage) !important;
+}
+
+.favBtn:hover,
+.activeFav {
+  background: var(--accent-sage) !important;
+  color: white !important;
+  border-color: var(--accent-sage) !important;
+}
+
+.pearlMode {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-light);
+  text-decoration: none;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--border-warm);
+  border-radius: 20px;
+  transition: all 0.3s;
+  opacity: 0.6;
+}
+
+.pearlMode:hover {
+  opacity: 1;
+  color: var(--accent-terracotta);
+  border-color: var(--accent-terracotta);
+}
+
+@media (max-width: 768px) {
+  .headerInner { flex-direction: column; text-align: center; }
+  .searchBar { width: 100%; }
+  .nav { justify-content: center; }
+}

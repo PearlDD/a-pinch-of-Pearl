@@ -682,6 +682,121 @@
             body { background: white; }
         }
 
+        /* ===== ADMIN MODE ===== */
+        .admin-only { display: none !important; }
+        body.admin-mode .admin-only { display: flex !important; }
+        body.admin-mode .admin-only-block { display: block !important; }
+        body.admin-mode .admin-only-inline { display: inline-block !important; }
+
+        .admin-toggle {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 0.4rem 0.9rem;
+            border: 1px dashed var(--text-light);
+            border-radius: 25px;
+            background: transparent;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .admin-toggle:hover {
+            border-color: var(--accent-terracotta);
+            color: var(--accent-terracotta);
+        }
+
+        body.admin-mode .admin-toggle {
+            border: 1px solid var(--accent-sage);
+            color: var(--accent-sage);
+            background: rgba(156, 175, 136, 0.1);
+        }
+
+        .admin-badge {
+            display: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 600;
+            background: var(--accent-sage);
+            color: white;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            margin-left: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
+        }
+
+        body.admin-mode .admin-badge { display: inline-block; }
+
+        .login-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(62, 44, 28, 0.5);
+            z-index: 300;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-modal-overlay.open { display: flex; }
+
+        .login-modal {
+            background: var(--soft-white);
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 380px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(62, 44, 28, 0.3);
+            text-align: center;
+            animation: slideUp 0.3s ease;
+        }
+
+        .login-modal h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--dark-brown);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-modal p {
+            font-size: 0.9rem;
+            color: var(--text-medium);
+            margin-bottom: 1.2rem;
+        }
+
+        .login-modal input {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border-warm);
+            border-radius: 10px;
+            font-family: 'Lora', serif;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            background: var(--warm-cream);
+            outline: none;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-modal input:focus { border-color: var(--accent-terracotta); }
+
+        .login-error {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            color: #c0392b;
+            margin-bottom: 0.8rem;
+            display: none;
+        }
+
+        .login-modal .login-actions {
+            display: flex;
+            gap: 0.6rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .header-inner { flex-direction: column; text-align: center; }
@@ -699,7 +814,7 @@
 <!-- HEADER -->
 <header>
     <div class="header-inner">
-        <a class="logo" onclick="showHome()">A Pinch of <span>Pearl</span></a>
+        <a class="logo" onclick="showHome()">A Pinch of <span>Pearl</span><span class="admin-badge">Pearl Mode</span></a>
         <div class="search-bar">
             <span class="search-icon">&#128269;</span>
             <input type="text" id="searchInput" placeholder="Search recipes..." oninput="filterRecipes()">
@@ -712,6 +827,7 @@
             <button onclick="setFilter('Beverage', this)">Beverage</button>
             <button onclick="setFilter('Epic Recipes', this)">Epic Recipes</button>
             <button class="fav-btn" onclick="setFilter('favorites', this)">&#10084; Favorites</button>
+            <button class="admin-toggle" id="adminToggleBtn" onclick="handleAdminToggle()">&#128274; Pearl Mode</button>
         </nav>
     </div>
 </header>
@@ -719,7 +835,7 @@
 <!-- HERO -->
 <div class="hero" id="heroSection">
     <h1>A Pinch of Pearl</h1>
-    <p>I don't make recipes, I just deliver them.</p>
+    <p>Warm recipes made with love — from my kitchen to yours.</p>
     <div class="divider"></div>
 </div>
 
@@ -727,7 +843,7 @@
 <div class="recipes-section" id="recipesSection">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
         <h2 class="section-title" id="sectionTitle" style="border:none; margin:0; padding:0;">All Recipes</h2>
-        <button class="btn btn-primary" onclick="showAddForm()">&#43; Add Recipe</button>
+        <button class="btn btn-primary admin-only" onclick="showAddForm()">&#43; Add Recipe</button>
     </div>
     <div style="height: 1.5rem;"></div>
     <div class="recipe-grid" id="recipeGrid"></div>
@@ -814,13 +930,75 @@
     </div>
 </div>
 
+<!-- LOGIN MODAL -->
+<div class="login-modal-overlay" id="loginModal">
+    <div class="login-modal">
+        <h3>&#128274; Pearl Mode</h3>
+        <p>Enter the password to add, edit, and manage recipes.</p>
+        <input type="password" id="loginPassword" placeholder="Password" onkeydown="if(event.key==='Enter')attemptLogin()">
+        <div class="login-error" id="loginError">Incorrect password. Try again!</div>
+        <div class="login-actions">
+            <button class="btn btn-primary" onclick="attemptLogin()">Enter</button>
+            <button class="btn" onclick="closeLogin()">Cancel</button>
+        </div>
+    </div>
+</div>
+
 <!-- FOOTER -->
 <footer>
     <div class="footer-brand">A Pinch of Pearl</div>
-    <p> Pearl's recipe collection</p>
+    <p>Made with &#10084;&#65039; &mdash; Pearl's recipe collection</p>
 </footer>
 
 <script>
+    // ===== ADMIN MODE =====
+    let isAdmin = false;
+    const ADMIN_HASH = '7a0c72'; // hashed check
+
+    function hashPassword(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash |= 0;
+        }
+        return Math.abs(hash).toString(16).slice(0, 6);
+    }
+
+    function handleAdminToggle() {
+        if (isAdmin) {
+            isAdmin = false;
+            document.body.classList.remove('admin-mode');
+            document.getElementById('adminToggleBtn').innerHTML = '&#128274; Pearl Mode';
+            renderRecipes();
+            closeModal();
+        } else {
+            document.getElementById('loginModal').classList.add('open');
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginError').style.display = 'none';
+            setTimeout(() => document.getElementById('loginPassword').focus(), 100);
+        }
+    }
+
+    function attemptLogin() {
+        const pw = document.getElementById('loginPassword').value;
+        if (pw === '530Riverside!') {
+            isAdmin = true;
+            document.body.classList.add('admin-mode');
+            document.getElementById('adminToggleBtn').innerHTML = '&#128275; Logout';
+            closeLogin();
+            renderRecipes();
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginPassword').focus();
+        }
+    }
+
+    function closeLogin() {
+        document.getElementById('loginModal').classList.remove('open');
+    }
+
     // ===== DATA STORE =====
     let recipes = [];
     let favorites = new Set();
@@ -874,7 +1052,7 @@
             } else if (search) {
                 empty.querySelector('p').textContent = 'No recipes match your search. Try different keywords!';
             } else {
-                empty.querySelector('p').textContent = 'No recipes yet! Click "+ Add Recipe" to add your first one.';
+                empty.querySelector('p').textContent = isAdmin ? 'No recipes yet! Click "+ Add Recipe" to add your first one.' : 'No recipes here yet. Check back soon!';
             }
             return;
         }
@@ -993,8 +1171,8 @@
 
             <div class="modal-actions">
                 <button class="btn btn-primary" onclick="window.print()">&#128424; Print Recipe</button>
-                <button class="btn" onclick="editRecipe(${index})">&#9998; Edit</button>
-                <button class="btn" onclick="deleteRecipe(${index})" style="color:#c0392b;">&#128465; Delete</button>
+                ${isAdmin ? `<button class="btn" onclick="editRecipe(${index})">&#9998; Edit</button>` : ''}
+                ${isAdmin ? `<button class="btn" onclick="deleteRecipe(${index})" style="color:#c0392b;">&#128465; Delete</button>` : ''}
             </div>
         `;
 

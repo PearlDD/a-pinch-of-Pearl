@@ -1,0 +1,330 @@
+.header {
+  background: linear-gradient(135deg, var(--soft-peach) 0%, var(--warm-cream) 100%);
+  border-bottom: 2px solid var(--border-warm);
+  padding: 1.2rem 2rem;
+}
+
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--dark-brown);
+  text-decoration: none;
+}
+
+.logo span { color: var(--accent-terracotta); }
+
+.article {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.heroImage {
+  width: 100%;
+  height: 400px;
+  background: linear-gradient(135deg, var(--soft-peach), var(--border-warm));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.heroImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.placeholderIcon {
+  font-size: 4rem;
+  opacity: 0.3;
+}
+
+.content {
+  padding: 2rem 2.5rem 3rem;
+}
+
+.backLink {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  color: var(--accent-terracotta);
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+  transition: opacity 0.2s;
+}
+
+.backLink:hover { opacity: 0.7; }
+
+.category {
+  display: inline-block;
+  background: var(--soft-peach);
+  color: var(--accent-terracotta);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.8rem;
+}
+
+.content h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  color: var(--dark-brown);
+  margin-bottom: 0.3rem;
+  line-height: 1.3;
+}
+
+.description {
+  color: var(--text-medium);
+  margin-top: 0.5rem;
+  font-size: 1.05rem;
+}
+
+.likeRow {
+  margin: 1.2rem 0;
+}
+
+.metaBar {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 1rem 0;
+  border-top: 1px solid var(--border-warm);
+  border-bottom: 1px solid var(--border-warm);
+  margin: 0.5rem 0 1.5rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-medium);
+}
+
+.metaItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.metaLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-light);
+}
+
+.metaValue {
+  font-weight: 600;
+  color: var(--dark-brown);
+}
+
+.section { margin-bottom: 2rem; }
+
+.section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: var(--dark-brown);
+  margin-bottom: 0.8rem;
+}
+
+.ingredientsList {
+  list-style: none;
+  padding: 0;
+}
+
+.ingredientsList li {
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed var(--border-warm);
+  font-size: 0.95rem;
+  color: var(--text-medium);
+}
+
+.ingredientsList li::before {
+  content: "\2022";
+  color: var(--accent-terracotta);
+  font-weight: bold;
+  margin-right: 0.6rem;
+}
+
+.instructionsList {
+  list-style: none;
+  padding: 0;
+  counter-reset: step;
+}
+
+.instructionsList li {
+  counter-increment: step;
+  padding: 0.8rem 0 0.8rem 3rem;
+  border-bottom: 1px solid var(--border-warm);
+  position: relative;
+  font-size: 0.95rem;
+  color: var(--text-medium);
+  line-height: 1.6;
+}
+
+.instructionsList li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0.7rem;
+  width: 28px;
+  height: 28px;
+  background: var(--accent-terracotta);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.tipsSection {
+  background: #FFF8E7;
+  border: 1px solid #F0DEB4;
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+}
+
+.tipsSection h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  color: var(--dark-brown);
+  margin-bottom: 0.8rem;
+}
+
+.tipsList {
+  list-style: none;
+  padding: 0;
+}
+
+.tipsList li {
+  padding: 0.5rem 0 0.5rem 1.5rem;
+  position: relative;
+  font-size: 0.95rem;
+  color: var(--text-medium);
+  line-height: 1.6;
+}
+
+.tipsList li::before {
+  content: "\2022";
+  color: var(--accent-sage);
+  font-weight: bold;
+  font-size: 1.2rem;
+  position: absolute;
+  left: 0;
+  top: 0.4rem;
+}
+
+.tipsList li + li {
+  border-top: 1px dashed #F0DEB4;
+}
+
+/* Source section */
+.sourceSection {
+  background: var(--soft-peach);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+}
+
+.sourceSection h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  color: var(--dark-brown);
+  margin-bottom: 0.8rem;
+}
+
+.sourceEmpty {
+  color: var(--text-light);
+  font-style: italic;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.sourceLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--accent-terracotta);
+  text-decoration: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.6rem 1.2rem;
+  border: 1px solid var(--accent-terracotta);
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.sourceLink:hover {
+  background: var(--accent-terracotta);
+  color: white;
+}
+
+/* Photos gallery */
+.photosSection {
+  margin-bottom: 2rem;
+}
+
+.photosSection h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: var(--dark-brown);
+  margin-bottom: 1rem;
+}
+
+.photosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.photoItem {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-warm);
+  aspect-ratio: 4 / 3;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.photoItem:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 15px rgba(92, 64, 51, 0.15);
+}
+
+.photoItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.actions {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-warm);
+}
+
+@media print {
+  .header, .backLink, .actions, .likeRow { display: none !important; }
+  .heroImage { height: 250px; }
+  .content { padding: 1rem; }
+}
+
+@media (max-width: 768px) {
+  .content { padding: 1.5rem; }
+  .content h1 { font-size: 1.8rem; }
+  .heroImage { height: 250px; }
+}

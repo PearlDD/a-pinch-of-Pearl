@@ -1,0 +1,122 @@
+.page {
+  min-height: 100vh;
+  background: var(--warm-cream);
+}
+
+.header {
+  background: linear-gradient(135deg, var(--soft-peach) 0%, var(--warm-cream) 100%);
+  border-bottom: 2px solid var(--border-warm);
+  padding: 1.2rem 2rem;
+}
+
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--dark-brown);
+  text-decoration: none;
+}
+
+.logo span { color: var(--accent-terracotta); }
+
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.backLink {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  color: var(--accent-terracotta);
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+}
+
+.backLink:hover { opacity: 0.7; }
+
+.container h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  color: var(--dark-brown);
+  margin-bottom: 1.5rem;
+}
+
+.form {
+  background: var(--soft-white);
+  border: 1px solid var(--border-warm);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px var(--shadow-warm);
+}
+
+.formGroup {
+  margin-bottom: 1.3rem;
+}
+
+.formGroup label {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-medium);
+  margin-bottom: 0.4rem;
+}
+
+.formGroup input,
+.formGroup textarea,
+.formGroup select {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--border-warm);
+  border-radius: 10px;
+  font-family: 'Lora', serif;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  background: var(--warm-cream);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus,
+.formGroup select:focus {
+  border-color: var(--accent-terracotta);
+}
+
+.formGroup textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.hint {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  color: var(--text-light);
+  margin-top: 0.3rem;
+  display: block;
+}
+
+.error {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  color: #c0392b;
+  margin-bottom: 1rem;
+}
+
+.formActions {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .formRow { grid-template-columns: 1fr; }
+}

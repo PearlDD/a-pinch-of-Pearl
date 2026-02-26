@@ -1,0 +1,48 @@
+.likeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.2rem;
+  border: 1px solid var(--border-warm);
+  border-radius: 25px;
+  background: var(--soft-white);
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text-medium);
+  transition: all 0.2s;
+}
+
+.likeBtn:hover {
+  border-color: #e74c3c;
+  background: #fff5f5;
+}
+
+.likeBtn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.liked {
+  border-color: #e74c3c;
+  background: #fff5f5;
+}
+
+.heart {
+  font-size: 1.1rem;
+  transition: transform 0.2s;
+}
+
+.likeBtn:hover .heart {
+  transform: scale(1.2);
+}
+
+.count {
+  font-weight: 600;
+  color: var(--dark-brown);
+}
+
+.label {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}

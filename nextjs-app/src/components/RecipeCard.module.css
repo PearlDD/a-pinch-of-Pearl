@@ -1,0 +1,106 @@
+.card {
+  background: var(--soft-white);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border-warm);
+  box-shadow: 0 4px 20px var(--shadow-warm);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(92, 64, 51, 0.15);
+}
+
+.cardImage {
+  width: 100%;
+  height: 220px;
+  background: linear-gradient(135deg, var(--soft-peach), var(--border-warm));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.cardImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardImage .placeholder {
+  font-size: 3rem;
+  opacity: 0.3;
+}
+
+.categoryBadge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: var(--accent-terracotta);
+  color: white;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.favoriteBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.favoriteBtn:hover { transform: scale(1.15); }
+.favorited { background: #FFE0E0; }
+
+.cardContent {
+  padding: 1.2rem 1.5rem 1.5rem;
+}
+
+.cardContent h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  color: var(--dark-brown);
+  margin-bottom: 0.4rem;
+}
+
+.recipeDesc {
+  font-size: 0.9rem;
+  color: var(--text-medium);
+  margin-bottom: 0.8rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cardMeta {
+  display: flex;
+  gap: 1rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+  color: var(--text-light);
+}
+
+.cardMeta span {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}

@@ -1,0 +1,31 @@
+.hero {
+  text-align: center;
+  padding: 4rem 2rem 3rem;
+  background: linear-gradient(180deg, var(--warm-cream) 0%, var(--soft-white) 100%);
+}
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  color: var(--dark-brown);
+  margin-bottom: 0.5rem;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  color: var(--text-medium);
+  max-width: 550px;
+  margin: 0 auto;
+}
+
+.divider {
+  width: 60px;
+  height: 3px;
+  background: var(--accent-terracotta);
+  margin: 1.2rem auto 0;
+  border-radius: 2px;
+}
+
+@media (max-width: 768px) {
+  .hero h1 { font-size: 2.2rem; }
+}

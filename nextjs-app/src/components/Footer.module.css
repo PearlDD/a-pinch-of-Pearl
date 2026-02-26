@@ -1,0 +1,20 @@
+.footer {
+  text-align: center;
+  padding: 2.5rem 2rem;
+  background: var(--soft-peach);
+  border-top: 1px solid var(--border-warm);
+  margin-top: 3rem;
+}
+
+.footer p {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+
+.brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--dark-brown);
+  margin-bottom: 0.3rem;
+}
