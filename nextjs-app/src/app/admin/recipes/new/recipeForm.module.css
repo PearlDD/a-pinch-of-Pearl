@@ -117,6 +117,60 @@
   margin-top: 1.5rem;
 }
 
+.fileInput {
+  padding: 0.5rem !important;
+  background: var(--soft-white) !important;
+  cursor: pointer;
+}
+
+.uploadStatus {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  color: var(--accent-terracotta);
+  font-weight: 500;
+  display: block;
+  margin-top: 0.3rem;
+}
+
+.previewRow {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.previewImg {
+  width: 80px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border-warm);
+}
+
+.previewGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.removeBtn {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  color: #c0392b;
+  background: none;
+  border: 1px solid #c0392b;
+  border-radius: 6px;
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.removeBtn:hover {
+  background: #c0392b;
+  color: white;
+}
+
 @media (max-width: 768px) {
   .formRow { grid-template-columns: 1fr; }
 }

@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
+import { uploadPhoto } from '@/lib/uploadPhoto';
 import { CATEGORIES, Recipe } from '@/lib/types';
 import styles from '../../new/recipeForm.module.css';
 
@@ -29,6 +30,38 @@ export default function EditRecipePage() {
   const [photoUrl, setPhotoUrl] = useState('');
   const [photos, setPhotos] = useState('');
   const [sourceUrl, setSourceUrl] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [additionalUploading, setAdditionalUploading] = useState(false);
+
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const url = await uploadPhoto(file);
+      setPhotoUrl(url);
+    } catch (err: any) {
+      setError('Failed to upload cover photo: ' + err.message);
+    }
+    setUploading(false);
+  };
+
+  const handleAdditionalUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setAdditionalUploading(true);
+    try {
+      const urls: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const url = await uploadPhoto(files[i]);
+        urls.push(url);
+      }
+      setPhotos((prev) => (prev ? prev + '\n' + urls.join('\n') : urls.join('\n')));
+    } catch (err: any) {
+      setError('Failed to upload photos: ' + err.message);
+    }
+    setAdditionalUploading(false);
+  };
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/admin/login');
@@ -214,24 +247,45 @@ export default function EditRecipePage() {
           </div>
 
           <div className={styles.formGroup}>
-            <label>Cover Photo URL (optional)</label>
+            <label>Cover Photo (optional)</label>
             <input
-              type="text"
-              value={photoUrl}
-              onChange={(e) => setPhotoUrl(e.target.value)}
-              placeholder="https://example.com/photo.jpg"
+              type="file"
+              accept="image/*,.heic,.heif"
+              onChange={handleCoverUpload}
+              className={styles.fileInput}
             />
+            {uploading && <span className={styles.uploadStatus}>Uploading...</span>}
+            {photoUrl && (
+              <div className={styles.previewRow}>
+                <img src={photoUrl} alt="Cover preview" className={styles.previewImg} />
+                <button type="button" className={styles.removeBtn} onClick={() => setPhotoUrl('')}>Remove</button>
+              </div>
+            )}
             <span className={styles.hint}>Main hero image at the top</span>
           </div>
 
           <div className={styles.formGroup}>
-            <label>Additional Photo URLs (optional)</label>
-            <textarea
-              value={photos}
-              onChange={(e) => setPhotos(e.target.value)}
-              placeholder={"One URL per line"}
-              rows={3}
+            <label>Additional Photos (optional)</label>
+            <input
+              type="file"
+              accept="image/*,.heic,.heif"
+              multiple
+              onChange={handleAdditionalUpload}
+              className={styles.fileInput}
             />
+            {additionalUploading && <span className={styles.uploadStatus}>Uploading...</span>}
+            {photos && (
+              <div className={styles.previewGrid}>
+                {photos.split('\n').filter(u => u.trim()).map((url, i) => (
+                  <div key={i} className={styles.previewRow}>
+                    <img src={url} alt={`Photo ${i + 1}`} className={styles.previewImg} />
+                    <button type="button" className={styles.removeBtn} onClick={() => {
+                      setPhotos(photos.split('\n').filter((_, idx) => idx !== i).join('\n'));
+                    }}>Remove</button>
+                  </div>
+                ))}
+              </div>
+            )}
             <span className={styles.hint}>Photos gallery section</span>
           </div>
 
