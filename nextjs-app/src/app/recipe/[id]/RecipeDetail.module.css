@@ -21,7 +21,7 @@
 
 .heroImage {
   width: 100%;
-  height: 400px;
+  max-height: 500px;
   background: linear-gradient(135deg, var(--soft-peach), var(--border-warm));
   display: flex;
   align-items: center;
@@ -32,11 +32,9 @@
 
 .heroImage img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  position: absolute;
-  top: 0;
-  left: 0;
+  height: auto;
+  object-fit: contain;
+  display: block;
 }
 
 .placeholderIcon {
@@ -319,12 +317,12 @@
 
 @media print {
   .header, .backLink, .actions, .likeRow { display: none !important; }
-  .heroImage { height: 250px; }
+  .heroImage { max-height: 300px; }
   .content { padding: 1rem; }
 }
 
 @media (max-width: 768px) {
   .content { padding: 1.5rem; }
   .content h1 { font-size: 1.8rem; }
-  .heroImage { height: 250px; }
+  .heroImage { max-height: 350px; }
 }
