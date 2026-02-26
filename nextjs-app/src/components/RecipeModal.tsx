@@ -1,7 +1,6 @@
 'use client';
 
 import { Recipe } from '@/lib/types';
-import { getEmbedUrl } from '@/lib/videoEmbed';
 import styles from './RecipeModal.module.css';
 
 interface RecipeModalProps {
@@ -18,7 +17,9 @@ export default function RecipeModal({ recipe, onClose }: RecipeModalProps) {
   const instructions = recipe.instructions
     ? recipe.instructions.split('\n').filter((l) => l.trim())
     : [];
-  const embedUrl = recipe.video_url ? getEmbedUrl(recipe.video_url) : null;
+  const tips = recipe.tips
+    ? recipe.tips.split('\n').filter((l) => l.trim())
+    : [];
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -89,22 +90,14 @@ export default function RecipeModal({ recipe, onClose }: RecipeModalProps) {
             </div>
           )}
 
-          {embedUrl ? (
-            <div className={styles.videoSection}>
-              <h3>Video</h3>
-              <iframe
-                src={embedUrl}
-                allowFullScreen
-                title="Recipe video"
-              ></iframe>
-            </div>
-          ) : (
-            <div className={styles.videoSection}>
-              <h3>Video</h3>
-              <div className={styles.videoPlaceholder}>
-                <span className={styles.playIcon}>&#9654;</span>
-                <span>Video coming soon</span>
-              </div>
+          {tips.length > 0 && (
+            <div className={styles.section}>
+              <h3>Tips</h3>
+              <ul className={styles.ingredientsList}>
+                {tips.map((tip, i) => (
+                  <li key={i}>{tip}</li>
+                ))}
+              </ul>
             </div>
           )}
 
