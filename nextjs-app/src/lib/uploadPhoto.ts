@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 
-const BUCKET = 'recipe-photos';
+const BUCKET = 'recipe photos';
 
 export async function uploadPhoto(file: File): Promise<string> {
   // Generate unique filename
