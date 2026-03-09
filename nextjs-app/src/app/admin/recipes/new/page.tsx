@@ -60,6 +60,48 @@ export default function AddRecipePage() {
     setAdditionalUploading(false);
   };
 
+  const handlePasteCover = async (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.startsWith('image/')) {
+        e.preventDefault();
+        const file = items[i].getAsFile();
+        if (!file) return;
+        setUploading(true);
+        try {
+          const url = await uploadPhoto(file);
+          setPhotoUrl(url);
+        } catch (err: any) {
+          setError('Failed to upload pasted image: ' + err.message);
+        }
+        setUploading(false);
+        return;
+      }
+    }
+  };
+
+  const handlePasteAdditional = async (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.startsWith('image/')) {
+        e.preventDefault();
+        const file = items[i].getAsFile();
+        if (!file) return;
+        setAdditionalUploading(true);
+        try {
+          const url = await uploadPhoto(file);
+          setPhotos((prev) => (prev ? prev + '\n' + url : url));
+        } catch (err: any) {
+          setError('Failed to upload pasted image: ' + err.message);
+        }
+        setAdditionalUploading(false);
+        return;
+      }
+    }
+  };
+
   useEffect(() => {
     if (!authLoading && !user) router.push('/admin/login');
   }, [user, authLoading, router]);
@@ -211,6 +253,20 @@ export default function AddRecipePage() {
 
           <div className={styles.formGroup}>
             <label>Cover Photo (optional)</label>
+            <div
+              className={styles.pasteZone}
+              onPaste={handlePasteCover}
+              tabIndex={0}
+            >
+              {photoUrl ? (
+                <div className={styles.previewRow}>
+                  <img src={photoUrl} alt="Cover preview" className={styles.previewImg} />
+                  <button type="button" className={styles.removeBtn} onClick={() => setPhotoUrl('')}>Remove</button>
+                </div>
+              ) : (
+                <p className={styles.pasteHint}>Click here and press Cmd+V to paste an image</p>
+              )}
+            </div>
             <input
               type="file"
               accept="image/*,.heic,.heif"
@@ -225,17 +281,31 @@ export default function AddRecipePage() {
               placeholder="Or paste image URL here"
               style={{ marginTop: '0.5rem' }}
             />
-            {photoUrl && (
-              <div className={styles.previewRow}>
-                <img src={photoUrl} alt="Cover preview" className={styles.previewImg} />
-                <button type="button" className={styles.removeBtn} onClick={() => setPhotoUrl('')}>Remove</button>
-              </div>
-            )}
-            <span className={styles.hint}>Upload a file or paste a URL — this will be the main hero image</span>
+            <span className={styles.hint}>Paste an image (Cmd+V), choose a file, or enter a URL</span>
           </div>
 
           <div className={styles.formGroup}>
             <label>Additional Photos (optional)</label>
+            <div
+              className={styles.pasteZone}
+              onPaste={handlePasteAdditional}
+              tabIndex={0}
+            >
+              {photos ? (
+                <div className={styles.previewGrid}>
+                  {photos.split('\n').filter(u => u.trim()).map((url, i) => (
+                    <div key={i} className={styles.previewRow}>
+                      <img src={url} alt={`Photo ${i + 1}`} className={styles.previewImg} />
+                      <button type="button" className={styles.removeBtn} onClick={() => {
+                        setPhotos(photos.split('\n').filter((_, idx) => idx !== i).join('\n'));
+                      }}>Remove</button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className={styles.pasteHint}>Click here and press Cmd+V to paste an image</p>
+              )}
+            </div>
             <input
               type="file"
               accept="image/*,.heic,.heif"
@@ -244,6 +314,7 @@ export default function AddRecipePage() {
               className={styles.fileInput}
             />
             {additionalUploading && <span className={styles.uploadStatus}>Uploading...</span>}
+            <span className={styles.hint}>Paste an image (Cmd+V), choose files, or enter URLs below</span>
             <textarea
               value={photos}
               onChange={(e) => setPhotos(e.target.value)}
@@ -251,19 +322,6 @@ export default function AddRecipePage() {
               rows={2}
               style={{ marginTop: '0.5rem' }}
             />
-            {photos && (
-              <div className={styles.previewGrid}>
-                {photos.split('\n').filter(u => u.trim()).map((url, i) => (
-                  <div key={i} className={styles.previewRow}>
-                    <img src={url} alt={`Photo ${i + 1}`} className={styles.previewImg} />
-                    <button type="button" className={styles.removeBtn} onClick={() => {
-                      setPhotos(photos.split('\n').filter((_, idx) => idx !== i).join('\n'));
-                    }}>Remove</button>
-                  </div>
-                ))}
-              </div>
-            )}
-            <span className={styles.hint}>Upload files or paste URLs — these appear in the Photos gallery</span>
           </div>
 
           <div className={styles.formGroup}>

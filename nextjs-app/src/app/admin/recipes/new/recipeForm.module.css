@@ -171,6 +171,38 @@
   color: white;
 }
 
+.pasteZone {
+  border: 2px dashed var(--border-warm);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  margin-bottom: 0.5rem;
+  background: var(--warm-cream);
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pasteZone:focus {
+  border-color: var(--accent-terracotta);
+  background: var(--soft-peach);
+  outline: none;
+}
+
+.pasteZone:hover {
+  border-color: var(--accent-terracotta);
+}
+
+.pasteHint {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  margin: 0;
+}
+
 @media (max-width: 768px) {
   .formRow { grid-template-columns: 1fr; }
 }
