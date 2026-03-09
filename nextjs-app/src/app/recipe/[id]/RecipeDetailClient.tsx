@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Recipe } from '@/lib/types';
+import { useRouter } from 'next/navigation';
+import { Recipe, CATEGORIES } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import LikeButton from '@/components/LikeButton';
 import CommentSection from '@/components/CommentSection';
 import Footer from '@/components/Footer';
+import headerStyles from '@/components/Header.module.css';
 import styles from './RecipeDetail.module.css';
 
 interface RecipeDetailClientProps {
@@ -16,6 +18,9 @@ interface RecipeDetailClientProps {
 export default function RecipeDetailClient({
   recipe,
 }: RecipeDetailClientProps) {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+
   // Track view count
   useEffect(() => {
     supabase
@@ -31,6 +36,10 @@ export default function RecipeDetailClient({
   const instructions = recipe.instructions
     ? recipe.instructions.split('\n').filter((l) => l.trim())
     : [];
+  // Strip leading numbers like "1. " or "2) " from instructions since <ol> adds its own
+  const cleanInstructions = instructions.map((step) =>
+    step.replace(/^\d+[\.\)\-]\s*/, '')
+  );
   const tips = recipe.tips
     ? recipe.tips.split('\n').filter((l) => l.trim())
     : [];
@@ -38,13 +47,63 @@ export default function RecipeDetailClient({
     ? recipe.photos.split('\n').filter((l) => l.trim())
     : [];
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (query.trim()) {
+      router.push(`/?search=${encodeURIComponent(query.trim())}`);
+    }
+  };
+
+  const handleFilterChange = (filter: string) => {
+    if (filter === 'all') {
+      router.push('/');
+    } else {
+      router.push(`/?filter=${encodeURIComponent(filter)}`);
+    }
+  };
+
   return (
     <>
-      {/* Simple header */}
-      <header className={styles.header}>
-        <Link href="/" className={styles.logo}>
-          A Pinch of <span>Pearl</span>
-        </Link>
+      {/* Full header matching home page */}
+      <header className={headerStyles.header}>
+        <div className={headerStyles.headerInner}>
+          <Link href="/" className={headerStyles.logo}>
+            A Pinch of <span>Pearl</span>
+          </Link>
+
+          <div className={headerStyles.searchBar}>
+            <span className={headerStyles.searchIcon}>&#128269;</span>
+            <input
+              type="text"
+              placeholder="Search recipes..."
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+          </div>
+
+          <nav className={headerStyles.nav}>
+            <button onClick={() => handleFilterChange('all')}>All</button>
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                className={recipe.category === cat ? headerStyles.active : ''}
+                onClick={() => handleFilterChange(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+            <button
+              className={headerStyles.favBtn}
+              onClick={() => handleFilterChange('favorites')}
+            >
+              &#10084; Favorites
+            </button>
+          </nav>
+
+          <Link href="/admin/login" className={headerStyles.pearlMode}>
+            &#128274; Pearl Mode
+          </Link>
+        </div>
       </header>
 
       <article className={styles.article}>
@@ -81,15 +140,13 @@ export default function RecipeDetailClient({
             <LikeButton recipeId={recipe.id} />
           </div>
 
-          {/* Meta bar */}
-          {recipe.servings && (
-            <div className={styles.metaBar}>
-              <div className={styles.metaItem}>
-                <span className={styles.metaLabel}>Servings</span>
-                <span className={styles.metaValue}>{recipe.servings}</span>
-              </div>
+          {/* Meta bar — always show servings */}
+          <div className={styles.metaBar}>
+            <div className={styles.metaItem}>
+              <span className={styles.metaLabel}>SERVINGS</span>
+              <span className={styles.metaValue}>{recipe.servings || '—'}</span>
             </div>
-          )}
+          </div>
 
           {/* Ingredients */}
           {ingredients.length > 0 && (
@@ -104,11 +161,11 @@ export default function RecipeDetailClient({
           )}
 
           {/* Instructions */}
-          {instructions.length > 0 && (
+          {cleanInstructions.length > 0 && (
             <section className={styles.section}>
               <h2>Instructions</h2>
               <ol className={styles.instructionsList}>
-                {instructions.map((step, i) => (
+                {cleanInstructions.map((step, i) => (
                   <li key={i}>{step}</li>
                 ))}
               </ol>
