@@ -60,47 +60,43 @@ export default function AddRecipePage() {
     setAdditionalUploading(false);
   };
 
-  const handlePasteCover = async (e: React.ClipboardEvent) => {
-    const items = e.clipboardData?.items;
-    if (!items) return;
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].type.startsWith('image/')) {
-        e.preventDefault();
-        const file = items[i].getAsFile();
-        if (!file) return;
-        setUploading(true);
-        try {
-          const url = await uploadPhoto(file);
-          setPhotoUrl(url);
-        } catch (err: any) {
-          setError('Failed to upload pasted image: ' + err.message);
+  // Global paste listener — works anywhere on the page
+  useEffect(() => {
+    const handleGlobalPaste = async (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.startsWith('image/')) {
+          e.preventDefault();
+          const file = items[i].getAsFile();
+          if (!file) return;
+          // If no cover photo yet, set as cover; otherwise add to additional
+          if (!photoUrl) {
+            setUploading(true);
+            try {
+              const url = await uploadPhoto(file);
+              setPhotoUrl(url);
+            } catch (err: any) {
+              setError('Failed to upload pasted image: ' + err.message);
+            }
+            setUploading(false);
+          } else {
+            setAdditionalUploading(true);
+            try {
+              const url = await uploadPhoto(file);
+              setPhotos((prev) => (prev ? prev + '\n' + url : url));
+            } catch (err: any) {
+              setError('Failed to upload pasted image: ' + err.message);
+            }
+            setAdditionalUploading(false);
+          }
+          return;
         }
-        setUploading(false);
-        return;
       }
-    }
-  };
-
-  const handlePasteAdditional = async (e: React.ClipboardEvent) => {
-    const items = e.clipboardData?.items;
-    if (!items) return;
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].type.startsWith('image/')) {
-        e.preventDefault();
-        const file = items[i].getAsFile();
-        if (!file) return;
-        setAdditionalUploading(true);
-        try {
-          const url = await uploadPhoto(file);
-          setPhotos((prev) => (prev ? prev + '\n' + url : url));
-        } catch (err: any) {
-          setError('Failed to upload pasted image: ' + err.message);
-        }
-        setAdditionalUploading(false);
-        return;
-      }
-    }
-  };
+    };
+    document.addEventListener('paste', handleGlobalPaste);
+    return () => document.removeEventListener('paste', handleGlobalPaste);
+  }, [photoUrl]);
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/admin/login');
@@ -255,16 +251,16 @@ export default function AddRecipePage() {
             <label>Cover Photo (optional)</label>
             <div
               className={styles.pasteZone}
-              onPaste={handlePasteCover}
-              tabIndex={0}
             >
               {photoUrl ? (
                 <div className={styles.previewRow}>
                   <img src={photoUrl} alt="Cover preview" className={styles.previewImg} />
                   <button type="button" className={styles.removeBtn} onClick={() => setPhotoUrl('')}>Remove</button>
                 </div>
+              ) : uploading ? (
+                <p className={styles.pasteHint}>Uploading...</p>
               ) : (
-                <p className={styles.pasteHint}>Click here and press Cmd+V to paste an image</p>
+                <p className={styles.pasteHint}>Press Cmd+V anywhere on this page to paste an image</p>
               )}
             </div>
             <input
@@ -288,8 +284,6 @@ export default function AddRecipePage() {
             <label>Additional Photos (optional)</label>
             <div
               className={styles.pasteZone}
-              onPaste={handlePasteAdditional}
-              tabIndex={0}
             >
               {photos ? (
                 <div className={styles.previewGrid}>
