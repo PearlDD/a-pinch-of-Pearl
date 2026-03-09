@@ -255,13 +255,20 @@ export default function EditRecipePage() {
               className={styles.fileInput}
             />
             {uploading && <span className={styles.uploadStatus}>Uploading...</span>}
+            <input
+              type="text"
+              value={photoUrl}
+              onChange={(e) => setPhotoUrl(e.target.value)}
+              placeholder="Or paste image URL here"
+              style={{ marginTop: '0.5rem' }}
+            />
             {photoUrl && (
               <div className={styles.previewRow}>
                 <img src={photoUrl} alt="Cover preview" className={styles.previewImg} />
                 <button type="button" className={styles.removeBtn} onClick={() => setPhotoUrl('')}>Remove</button>
               </div>
             )}
-            <span className={styles.hint}>Main hero image at the top</span>
+            <span className={styles.hint}>Upload a file or paste a URL — main hero image</span>
           </div>
 
           <div className={styles.formGroup}>
@@ -274,6 +281,13 @@ export default function EditRecipePage() {
               className={styles.fileInput}
             />
             {additionalUploading && <span className={styles.uploadStatus}>Uploading...</span>}
+            <textarea
+              value={photos}
+              onChange={(e) => setPhotos(e.target.value)}
+              placeholder={"Or paste image URLs here, one per line"}
+              rows={2}
+              style={{ marginTop: '0.5rem' }}
+            />
             {photos && (
               <div className={styles.previewGrid}>
                 {photos.split('\n').filter(u => u.trim()).map((url, i) => (
@@ -286,7 +300,7 @@ export default function EditRecipePage() {
                 ))}
               </div>
             )}
-            <span className={styles.hint}>Photos gallery section</span>
+            <span className={styles.hint}>Upload files or paste URLs — Photos gallery section</span>
           </div>
 
           <div className={styles.formGroup}>
