@@ -37,7 +37,6 @@ export const CATEGORIES = [
   'Flour-Based Food',
   'Dessert',
   'Beverage',
-  'Epic Recipes',
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];

@@ -8,7 +8,7 @@ import RecipeCard from '@/components/RecipeCard';
 import Footer from '@/components/Footer';
 import { useRecipes } from '@/hooks/useRecipes';
 import { useFavorites } from '@/hooks/useFavorites';
-import { Recipe } from '@/lib/types';
+import { Recipe, CATEGORIES } from '@/lib/types';
 import styles from './page.module.css';
 
 export default function Home() {
@@ -40,8 +40,28 @@ export default function Home() {
       );
     }
 
-    return filtered;
+    // Sort alphabetically by name
+    return filtered.sort((a, b) => a.name.localeCompare(b.name));
   }, [recipes, currentFilter, searchQuery, favorites]);
+
+  // Group recipes by category for the "All" view
+  const groupedByCategory = useMemo(() => {
+    if (currentFilter !== 'all' || searchQuery.trim()) return null;
+    const groups: { category: string; recipes: Recipe[] }[] = [];
+    for (const cat of CATEGORIES) {
+      const catRecipes = filteredRecipes.filter((r) => r.category === cat);
+      if (catRecipes.length > 0) {
+        groups.push({ category: cat, recipes: catRecipes });
+      }
+    }
+    // Catch any recipes with categories not in CATEGORIES list
+    const knownCats = new Set(CATEGORIES as readonly string[]);
+    const otherRecipes = filteredRecipes.filter((r) => !knownCats.has(r.category));
+    if (otherRecipes.length > 0) {
+      groups.push({ category: 'Other', recipes: otherRecipes });
+    }
+    return groups;
+  }, [filteredRecipes, currentFilter, searchQuery]);
 
   const sectionTitle =
     currentFilter === 'all'
@@ -83,10 +103,6 @@ export default function Home() {
       <Hero />
 
       <div className={styles.recipesSection}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>{sectionTitle}</h2>
-        </div>
-
         {loading ? (
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>&#9203;</div>
@@ -102,18 +118,45 @@ export default function Home() {
             <div className={styles.emptyIcon}>&#127859;</div>
             <p>{getEmptyMessage()}</p>
           </div>
+        ) : groupedByCategory ? (
+          /* Grouped view for "All" */
+          groupedByCategory.map((group) => (
+            <div key={group.category} className={styles.categorySection}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>{group.category}</h2>
+                <span className={styles.recipeCount}>{group.recipes.length} {group.recipes.length === 1 ? 'recipe' : 'recipes'}</span>
+              </div>
+              <div className={styles.recipeGrid}>
+                {group.recipes.map((recipe) => (
+                  <RecipeCard
+                    key={recipe.id}
+                    recipe={recipe}
+                    isFavorite={isFavorite(recipe.id)}
+                    onToggleFavorite={toggleFavorite}
+                    onClick={handleRecipeClick}
+                  />
+                ))}
+              </div>
+            </div>
+          ))
         ) : (
-          <div className={styles.recipeGrid}>
-            {filteredRecipes.map((recipe) => (
-              <RecipeCard
-                key={recipe.id}
-                recipe={recipe}
-                isFavorite={isFavorite(recipe.id)}
-                onToggleFavorite={toggleFavorite}
-                onClick={handleRecipeClick}
-              />
-            ))}
-          </div>
+          /* Flat view for filtered/search/favorites */
+          <>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>{sectionTitle}</h2>
+            </div>
+            <div className={styles.recipeGrid}>
+              {filteredRecipes.map((recipe) => (
+                <RecipeCard
+                  key={recipe.id}
+                  recipe={recipe}
+                  isFavorite={isFavorite(recipe.id)}
+                  onToggleFavorite={toggleFavorite}
+                  onClick={handleRecipeClick}
+                />
+              ))}
+            </div>
+          </>
         )}
       </div>
 
