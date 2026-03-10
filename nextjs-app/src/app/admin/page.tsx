@@ -73,8 +73,7 @@ export default function AdminDashboard() {
         (r) =>
           r.name.toLowerCase().includes(q) ||
           r.description.toLowerCase().includes(q) ||
-          r.category.toLowerCase().includes(q) ||
-          r.ingredients.toLowerCase().includes(q)
+          r.category.toLowerCase().includes(q)
       );
     }
 
