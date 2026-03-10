@@ -104,7 +104,8 @@ export default function AdminDashboard() {
   };
 
   const handleRecipeClick = (recipe: Recipe) => {
-    router.push(`/recipe/${recipe.id}`);
+    const params = currentFilter !== 'all' ? `?from=${encodeURIComponent(currentFilter)}` : '';
+    router.push(`/recipe/${recipe.id}${params}`);
   };
 
   const handleDelete = async (e: React.MouseEvent, recipe: Recipe) => {

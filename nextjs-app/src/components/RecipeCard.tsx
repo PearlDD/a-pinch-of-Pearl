@@ -37,7 +37,6 @@ export default function RecipeCard({
         >
           &#127858;
         </span>
-        <span className={styles.categoryBadge}>{recipe.category}</span>
         <button
           className={`${styles.favoriteBtn} ${isFavorite ? styles.favorited : ''}`}
           onClick={(e) => {

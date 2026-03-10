@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Recipe, CATEGORIES } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
@@ -20,8 +20,18 @@ export default function RecipeDetailClient({
   recipe,
 }: RecipeDetailClientProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isAdmin } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Determine where to go back to
+  const fromFilter = searchParams.get('from');
+  const backLabel = fromFilter && fromFilter !== 'all'
+    ? `Back to ${fromFilter}`
+    : 'Back to all recipes';
+  const backHref = fromFilter && fromFilter !== 'all'
+    ? `/?filter=${encodeURIComponent(fromFilter)}`
+    : '/';
 
   // Track view count (skip for admin)
   useEffect(() => {
@@ -124,8 +134,8 @@ export default function RecipeDetailClient({
         </div>
 
         <div className={styles.content}>
-          <Link href="/" className={styles.backLink}>
-            &larr; Back to all recipes
+          <Link href={backHref} className={styles.backLink}>
+            &larr; {backLabel}
           </Link>
 
           <span className={styles.category}>{recipe.category}</span>

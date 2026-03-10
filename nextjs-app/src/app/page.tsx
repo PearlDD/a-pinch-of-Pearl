@@ -76,7 +76,8 @@ export default function Home() {
   };
 
   const handleRecipeClick = (recipe: Recipe) => {
-    router.push(`/recipe/${recipe.id}`);
+    const params = currentFilter !== 'all' ? `?from=${encodeURIComponent(currentFilter)}` : '';
+    router.push(`/recipe/${recipe.id}${params}`);
   };
 
   const getEmptyMessage = () => {
