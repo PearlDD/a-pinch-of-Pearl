@@ -70,6 +70,14 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 0.8rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.category:hover {
+  background: var(--accent-terracotta);
+  color: white;
 }
 
 .content h1 {

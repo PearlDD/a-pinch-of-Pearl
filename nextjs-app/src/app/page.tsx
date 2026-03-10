@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import RecipeCard from '@/components/RecipeCard';
@@ -13,9 +13,11 @@ import styles from './page.module.css';
 
 export default function Home() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { recipes, loading, error } = useRecipes();
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
-  const [currentFilter, setCurrentFilter] = useState('all');
+  const initialFilter = searchParams.get('filter') || 'all';
+  const [currentFilter, setCurrentFilter] = useState(initialFilter);
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredRecipes = useMemo(() => {

@@ -26,9 +26,6 @@ export default function RecipeDetailClient({
 
   // Determine where to go back to
   const fromFilter = searchParams.get('from');
-  const backLabel = fromFilter && fromFilter !== 'all'
-    ? `Back to ${fromFilter}`
-    : 'Back to all recipes';
   const backHref = fromFilter && fromFilter !== 'all'
     ? `/?filter=${encodeURIComponent(fromFilter)}`
     : '/';
@@ -135,10 +132,12 @@ export default function RecipeDetailClient({
 
         <div className={styles.content}>
           <Link href={backHref} className={styles.backLink}>
-            &larr; {backLabel}
+            &larr; Back to recipes
           </Link>
 
-          <span className={styles.category}>{recipe.category}</span>
+          <Link href={`/?filter=${encodeURIComponent(recipe.category)}`} className={styles.category}>
+            {recipe.category}
+          </Link>
           <h1>{recipe.name}</h1>
           {recipe.description && (
             <p className={styles.description}>{recipe.description}</p>
