@@ -316,9 +316,10 @@
 }
 
 @media print {
-  .header, .backLink, .actions, .likeRow { display: none !important; }
-  .heroImage { max-height: 300px; }
+  .header, .backLink, .actions, .likeRow, .sourceSection, .photosSection { display: none !important; }
+  .heroImage { display: none !important; }
   .content { padding: 1rem; }
+  .category { display: none !important; }
 }
 
 @media (max-width: 768px) {

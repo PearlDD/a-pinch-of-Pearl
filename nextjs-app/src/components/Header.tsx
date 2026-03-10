@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { CATEGORIES } from '@/lib/types';
 import styles from './Header.module.css';
 
@@ -61,9 +60,6 @@ export default function Header({
           </button>
         </nav>
 
-        <Link href="/admin/login" className={styles.pearlMode}>
-          &#128274; Pearl Mode
-        </Link>
       </div>
     </header>
   );

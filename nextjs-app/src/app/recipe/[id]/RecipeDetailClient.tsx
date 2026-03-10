@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Recipe, CATEGORIES } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
 import LikeButton from '@/components/LikeButton';
 import CommentSection from '@/components/CommentSection';
 import Footer from '@/components/Footer';
@@ -19,16 +20,18 @@ export default function RecipeDetailClient({
   recipe,
 }: RecipeDetailClientProps) {
   const router = useRouter();
+  const { isAdmin } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Track view count
+  // Track view count (skip for admin)
   useEffect(() => {
+    if (isAdmin) return;
     supabase
       .from('recipes')
       .update({ view_count: (recipe.view_count || 0) + 1 })
       .eq('id', recipe.id)
       .then();
-  }, [recipe.id, recipe.view_count]);
+  }, [recipe.id, recipe.view_count, isAdmin]);
 
   const ingredients = recipe.ingredients
     ? recipe.ingredients.split('\n').filter((l) => l.trim())
@@ -99,10 +102,6 @@ export default function RecipeDetailClient({
               &#10084; Favorites
             </button>
           </nav>
-
-          <Link href="/admin/login" className={headerStyles.pearlMode}>
-            &#128274; Pearl Mode
-          </Link>
         </div>
       </header>
 
@@ -136,7 +135,7 @@ export default function RecipeDetailClient({
           )}
 
           {/* Like button */}
-          <div className={styles.likeRow}>
+          <div className={`${styles.likeRow} no-print`}>
             <LikeButton recipeId={recipe.id} />
           </div>
 
@@ -233,7 +232,9 @@ export default function RecipeDetailClient({
           </div>
 
           {/* Comments */}
-          <CommentSection recipeId={recipe.id} />
+          <div className="no-print">
+            <CommentSection recipeId={recipe.id} />
+          </div>
         </div>
       </article>
 
