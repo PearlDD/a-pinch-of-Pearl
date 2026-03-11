@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { Suspense, useState, useMemo, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
@@ -11,7 +11,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { Recipe, CATEGORIES } from '@/lib/types';
 import styles from './page.module.css';
 
-export default function Home() {
+function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { recipes, loading, error } = useRecipes();
@@ -19,6 +19,12 @@ export default function Home() {
   const initialFilter = searchParams.get('filter') || 'all';
   const [currentFilter, setCurrentFilter] = useState(initialFilter);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Sync filter when URL changes (e.g. navigating back from a recipe)
+  useEffect(() => {
+    const urlFilter = searchParams.get('filter') || 'all';
+    setCurrentFilter(urlFilter);
+  }, [searchParams]);
 
   const filteredRecipes = useMemo(() => {
     let filtered = recipes;
@@ -164,5 +170,13 @@ export default function Home() {
 
       <Footer />
     </>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense>
+      <HomeContent />
+    </Suspense>
   );
 }
