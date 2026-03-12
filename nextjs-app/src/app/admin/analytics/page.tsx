@@ -34,6 +34,7 @@ function getPeriodStart(period: Period): string | null {
 
 interface DayData {
   date: string;
+  views: number;
   likes: number;
   comments: number;
 }
@@ -43,6 +44,7 @@ export default function AnalyticsPage() {
   const { user, loading: authLoading, isAdmin, signOut } = useAuth();
   const [period, setPeriod] = useState<Period>('30d');
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [allViews, setAllViews] = useState<any[]>([]);
   const [allLikes, setAllLikes] = useState<any[]>([]);
   const [allComments, setAllComments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,6 +64,11 @@ export default function AnalyticsPage() {
         .order('created_at', { ascending: false });
       setRecipes(recipesData || []);
 
+      const { data: viewsData } = await supabase
+        .from('recipe_views')
+        .select('recipe_id, created_at');
+      setAllViews(viewsData || []);
+
       const { data: likesData } = await supabase
         .from('recipe_likes')
         .select('recipe_id, created_at');
@@ -79,6 +86,11 @@ export default function AnalyticsPage() {
 
   const periodStart = getPeriodStart(period);
 
+  const filteredViews = useMemo(() => {
+    if (!periodStart) return allViews;
+    return allViews.filter((v) => v.created_at >= periodStart);
+  }, [allViews, periodStart]);
+
   const filteredLikes = useMemo(() => {
     if (!periodStart) return allLikes;
     return allLikes.filter((l) => l.created_at >= periodStart);
@@ -89,7 +101,7 @@ export default function AnalyticsPage() {
     return allComments.filter((c) => c.created_at >= periodStart);
   }, [allComments, periodStart]);
 
-  const totalViews = recipes.reduce((sum, r) => sum + (r.view_count || 0), 0);
+  const totalViews = filteredViews.length;
   const totalLikes = filteredLikes.length;
   const totalComments = filteredComments.length;
 
@@ -99,11 +111,11 @@ export default function AnalyticsPage() {
 
     // Determine range
     const end = new Date();
+    const allEvents = [...allViews, ...allLikes, ...allComments];
     const start = periodStart ? new Date(periodStart) : (
-      allLikes.length > 0 || allComments.length > 0
+      allEvents.length > 0
         ? new Date(Math.min(
-            ...allLikes.map((l) => new Date(l.created_at).getTime()),
-            ...allComments.map((c) => new Date(c.created_at).getTime()),
+            ...allEvents.map((e) => new Date(e.created_at).getTime()),
             end.getTime()
           ))
         : new Date(end.getTime() - 30 * 24 * 60 * 60 * 1000)
@@ -113,9 +125,14 @@ export default function AnalyticsPage() {
     const cursor = new Date(start);
     while (cursor <= end) {
       const key = cursor.toISOString().slice(0, 10);
-      days[key] = { date: key, likes: 0, comments: 0 };
+      days[key] = { date: key, views: 0, likes: 0, comments: 0 };
       cursor.setDate(cursor.getDate() + 1);
     }
+
+    filteredViews.forEach((v) => {
+      const key = v.created_at.slice(0, 10);
+      if (days[key]) days[key].views++;
+    });
 
     filteredLikes.forEach((l) => {
       const key = l.created_at.slice(0, 10);
@@ -128,7 +145,7 @@ export default function AnalyticsPage() {
     });
 
     return Object.values(days).sort((a, b) => a.date.localeCompare(b.date));
-  }, [filteredLikes, filteredComments, periodStart, allLikes, allComments]);
+  }, [filteredViews, filteredLikes, filteredComments, periodStart, allViews, allLikes, allComments]);
 
   // Top recipes by views
   const topRecipes = useMemo(() => {
@@ -155,7 +172,7 @@ export default function AnalyticsPage() {
   }, [recipes, recipeLikeCounts]);
 
   // Chart rendering
-  const maxChart = Math.max(...chartData.map((d) => d.likes + d.comments), 1);
+  const maxChart = Math.max(...chartData.map((d) => d.views + d.likes + d.comments), 1);
 
   const handleSignOut = async () => {
     await signOut();
@@ -210,8 +227,8 @@ export default function AnalyticsPage() {
           <div className={styles.statCard}>
             <span className={styles.statIcon}>&#128065;</span>
             <span className={styles.statNumber}>{totalViews}</span>
-            <span className={styles.statLabel}>Total Views</span>
-            <span className={styles.statNote}>all time</span>
+            <span className={styles.statLabel}>Views</span>
+            <span className={styles.statNote}>{period === 'all' ? 'all time' : `last ${PERIOD_LABELS[period].toLowerCase()}`}</span>
           </div>
           <div className={styles.statCard}>
             <span className={styles.statIcon}>&#10084;</span>
@@ -237,6 +254,7 @@ export default function AnalyticsPage() {
         <div className={styles.chartSection}>
           <h2>Activity Over Time</h2>
           <div className={styles.chartLegend}>
+            <span className={styles.legendItem}><span className={styles.legendDotViews}></span> Views</span>
             <span className={styles.legendItem}><span className={styles.legendDotLikes}></span> Likes</span>
             <span className={styles.legendItem}><span className={styles.legendDotComments}></span> Comments</span>
           </div>
@@ -244,12 +262,14 @@ export default function AnalyticsPage() {
             {chartData.length > 0 ? (
               <div className={styles.chartBars}>
                 {chartData.map((d, i) => {
+                  const viewsH = (d.views / maxChart) * 100;
                   const likesH = (d.likes / maxChart) * 100;
                   const commentsH = (d.comments / maxChart) * 100;
                   const showLabel = chartData.length <= 14 || i % Math.ceil(chartData.length / 14) === 0;
                   return (
-                    <div key={d.date} className={styles.chartBarGroup} title={`${d.date}: ${d.likes} likes, ${d.comments} comments`}>
+                    <div key={d.date} className={styles.chartBarGroup} title={`${d.date}: ${d.views} views, ${d.likes} likes, ${d.comments} comments`}>
                       <div className={styles.chartBarStack}>
+                        {d.views > 0 && <div className={styles.chartBarViews} style={{ height: `${viewsH}%` }}></div>}
                         {d.likes > 0 && <div className={styles.chartBarLikes} style={{ height: `${likesH}%` }}></div>}
                         {d.comments > 0 && <div className={styles.chartBarComments} style={{ height: `${commentsH}%` }}></div>}
                       </div>

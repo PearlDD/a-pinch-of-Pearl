@@ -185,6 +185,7 @@
   gap: 0.4rem;
 }
 
+.legendDotViews,
 .legendDotLikes,
 .legendDotComments {
   width: 10px;
@@ -193,6 +194,7 @@
   display: inline-block;
 }
 
+.legendDotViews { background: #5b9bd5; }
 .legendDotLikes { background: var(--accent-terracotta); }
 .legendDotComments { background: var(--accent-sage); }
 
@@ -227,6 +229,13 @@
   gap: 1px;
   max-width: 24px;
   margin: 0 auto;
+}
+
+.chartBarViews {
+  background: #5b9bd5;
+  border-radius: 3px 3px 0 0;
+  min-height: 2px;
+  transition: height 0.3s;
 }
 
 .chartBarLikes {
