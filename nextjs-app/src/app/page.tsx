@@ -2,13 +2,17 @@
 
 import { Suspense, useState, useMemo, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import RecipeCard from '@/components/RecipeCard';
 import Footer from '@/components/Footer';
 import { useRecipes } from '@/hooks/useRecipes';
 import { useFavorites } from '@/hooks/useFavorites';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
 import { Recipe, CATEGORIES } from '@/lib/types';
+import adminStyles from '@/app/admin/admin.module.css';
 import styles from './page.module.css';
 
 function HomeContent() {
@@ -16,11 +20,11 @@ function HomeContent() {
   const searchParams = useSearchParams();
   const { recipes, loading, error } = useRecipes();
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
+  const { isAdmin, signOut } = useAuth();
   const initialFilter = searchParams.get('filter') || 'all';
   const [currentFilter, setCurrentFilter] = useState(initialFilter);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Sync filter when URL changes (e.g. navigating back from a recipe)
   useEffect(() => {
     const urlFilter = searchParams.get('filter') || 'all';
     setCurrentFilter(urlFilter);
@@ -29,7 +33,6 @@ function HomeContent() {
   const filteredRecipes = useMemo(() => {
     let filtered = recipes;
 
-    // When searching, search across ALL recipes regardless of tab
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -39,7 +42,6 @@ function HomeContent() {
           r.category.toLowerCase().includes(q)
       );
     } else {
-      // Only apply category/favorites filter when not searching
       if (currentFilter === 'favorites') {
         filtered = filtered.filter((r) => favorites.has(r.id));
       } else if (currentFilter !== 'all') {
@@ -47,11 +49,9 @@ function HomeContent() {
       }
     }
 
-    // Sort alphabetically by name
     return filtered.sort((a, b) => a.name.localeCompare(b.name));
   }, [recipes, currentFilter, searchQuery, favorites]);
 
-  // Group recipes by category for the "All" view
   const groupedByCategory = useMemo(() => {
     if (currentFilter !== 'all' || searchQuery.trim()) return null;
     const groups: { category: string; recipes: Recipe[] }[] = [];
@@ -61,7 +61,6 @@ function HomeContent() {
         groups.push({ category: cat, recipes: catRecipes });
       }
     }
-    // Catch any recipes with categories not in CATEGORIES list
     const knownCats = new Set(CATEGORIES as readonly string[]);
     const otherRecipes = filteredRecipes.filter((r) => !knownCats.has(r.category));
     if (otherRecipes.length > 0) {
@@ -88,6 +87,17 @@ function HomeContent() {
     router.push(`/recipe/${recipe.id}${params}`);
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  const handleDelete = async (e: React.MouseEvent, recipe: Recipe) => {
+    e.stopPropagation();
+    if (!confirm(`Are you sure you want to delete "${recipe.name}"?`)) return;
+    await supabase.from('recipes').delete().eq('id', recipe.id);
+    window.location.reload();
+  };
+
   const getEmptyMessage = () => {
     if (currentFilter === 'favorites') {
       return 'No favorites yet! Click the heart on any recipe to save it.';
@@ -96,6 +106,51 @@ function HomeContent() {
       return 'No recipes match your search. Try different keywords!';
     }
     return 'No recipes here yet. Check back soon!';
+  };
+
+  const renderRecipeCard = (recipe: Recipe) => {
+    if (isAdmin) {
+      return (
+        <div key={recipe.id} className={adminStyles.adminCardWrapper}>
+          <RecipeCard
+            recipe={recipe}
+            isFavorite={isFavorite(recipe.id)}
+            onToggleFavorite={toggleFavorite}
+            onClick={handleRecipeClick}
+          />
+          <div className={adminStyles.adminOverlay}>
+            <div className={adminStyles.adminStats}>
+              <span title="Views">&#128065; {recipe.view_count || 0}</span>
+            </div>
+            <div className={adminStyles.adminActions}>
+              <Link
+                href={`/admin/recipes/${recipe.id}/edit`}
+                className={adminStyles.editBtn}
+                onClick={(e) => e.stopPropagation()}
+              >
+                &#9998; Edit
+              </Link>
+              <button
+                className={adminStyles.deleteBtn}
+                onClick={(e) => handleDelete(e, recipe)}
+              >
+                &#128465; Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <RecipeCard
+        key={recipe.id}
+        recipe={recipe}
+        isFavorite={isFavorite(recipe.id)}
+        onToggleFavorite={toggleFavorite}
+        onClick={handleRecipeClick}
+      />
+    );
   };
 
   return (
@@ -107,6 +162,27 @@ function HomeContent() {
         onSearchChange={setSearchQuery}
         onLogoClick={handleLogoClick}
       />
+
+      {isAdmin && (
+        <div className={adminStyles.adminBar}>
+          <div className={adminStyles.adminBarInner}>
+            <div className={adminStyles.adminBarLeft}>
+              <span className={adminStyles.adminBadge}>Pearl Mode</span>
+              <span className={adminStyles.statsRow}>
+                <span>{recipes.length} recipes</span>
+              </span>
+            </div>
+            <div className={adminStyles.adminBarRight}>
+              <Link href="/admin/recipes/new" className="btn btn-primary">
+                &#43; Add Recipe
+              </Link>
+              <button className="btn" onClick={handleSignOut}>
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Hero />
 
@@ -127,7 +203,6 @@ function HomeContent() {
             <p>{getEmptyMessage()}</p>
           </div>
         ) : groupedByCategory ? (
-          /* Grouped view for "All" */
           groupedByCategory.map((group) => (
             <div key={group.category} className={styles.categorySection}>
               <div className={styles.sectionHeader}>
@@ -135,34 +210,17 @@ function HomeContent() {
                 <span className={styles.recipeCount}>{group.recipes.length} {group.recipes.length === 1 ? 'recipe' : 'recipes'}</span>
               </div>
               <div className={styles.recipeGrid}>
-                {group.recipes.map((recipe) => (
-                  <RecipeCard
-                    key={recipe.id}
-                    recipe={recipe}
-                    isFavorite={isFavorite(recipe.id)}
-                    onToggleFavorite={toggleFavorite}
-                    onClick={handleRecipeClick}
-                  />
-                ))}
+                {group.recipes.map(renderRecipeCard)}
               </div>
             </div>
           ))
         ) : (
-          /* Flat view for filtered/search/favorites */
           <>
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>{sectionTitle}</h2>
             </div>
             <div className={styles.recipeGrid}>
-              {filteredRecipes.map((recipe) => (
-                <RecipeCard
-                  key={recipe.id}
-                  recipe={recipe}
-                  isFavorite={isFavorite(recipe.id)}
-                  onToggleFavorite={toggleFavorite}
-                  onClick={handleRecipeClick}
-                />
-              ))}
+              {filteredRecipes.map(renderRecipeCard)}
             </div>
           </>
         )}

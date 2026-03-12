@@ -135,9 +135,6 @@ export default function RecipeDetailClient({
               </span>
             </div>
             <div className={adminStyles.adminBarRight}>
-              <Link href="/admin" className="btn">
-                &larr; Admin Home
-              </Link>
               <Link href={`/admin/recipes/${recipe.id}/edit`} className="btn btn-primary">
                 &#9998; Edit
               </Link>
