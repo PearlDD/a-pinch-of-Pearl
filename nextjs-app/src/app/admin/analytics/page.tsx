@@ -32,13 +32,6 @@ function getPeriodStart(period: Period): string | null {
   return now.toISOString();
 }
 
-interface DayData {
-  date: string;
-  views: number;
-  likes: number;
-  comments: number;
-}
-
 export default function AnalyticsPage() {
   const router = useRouter();
   const { user, loading: authLoading, isAdmin, signOut } = useAuth();
@@ -105,27 +98,24 @@ export default function AnalyticsPage() {
   const totalLikes = filteredLikes.length;
   const totalComments = filteredComments.length;
 
-  // Build daily chart data
-  const chartData = useMemo((): DayData[] => {
-    const days: Record<string, DayData> = {};
+  // Build daily views chart data
+  const chartData = useMemo(() => {
+    const days: Record<string, { date: string; views: number }> = {};
 
-    // Determine range
     const end = new Date();
-    const allEvents = [...allViews, ...allLikes, ...allComments];
     const start = periodStart ? new Date(periodStart) : (
-      allEvents.length > 0
+      allViews.length > 0
         ? new Date(Math.min(
-            ...allEvents.map((e) => new Date(e.created_at).getTime()),
+            ...allViews.map((e) => new Date(e.created_at).getTime()),
             end.getTime()
           ))
         : new Date(end.getTime() - 30 * 24 * 60 * 60 * 1000)
     );
 
-    // Fill in all days
     const cursor = new Date(start);
     while (cursor <= end) {
       const key = cursor.toISOString().slice(0, 10);
-      days[key] = { date: key, views: 0, likes: 0, comments: 0 };
+      days[key] = { date: key, views: 0 };
       cursor.setDate(cursor.getDate() + 1);
     }
 
@@ -134,25 +124,10 @@ export default function AnalyticsPage() {
       if (days[key]) days[key].views++;
     });
 
-    filteredLikes.forEach((l) => {
-      const key = l.created_at.slice(0, 10);
-      if (days[key]) days[key].likes++;
-    });
-
-    filteredComments.forEach((c) => {
-      const key = c.created_at.slice(0, 10);
-      if (days[key]) days[key].comments++;
-    });
-
     return Object.values(days).sort((a, b) => a.date.localeCompare(b.date));
-  }, [filteredViews, filteredLikes, filteredComments, periodStart, allViews, allLikes, allComments]);
+  }, [filteredViews, periodStart, allViews]);
 
-  // Top recipes by views
-  const topRecipes = useMemo(() => {
-    return [...recipes]
-      .sort((a, b) => (b.view_count || 0) - (a.view_count || 0))
-      .slice(0, 5);
-  }, [recipes]);
+  const maxChart = Math.max(...chartData.map((d) => d.views), 1);
 
   // Per-recipe likes for top liked
   const recipeLikeCounts = useMemo(() => {
@@ -171,8 +146,22 @@ export default function AnalyticsPage() {
       .slice(0, 5);
   }, [recipes, recipeLikeCounts]);
 
-  // Chart rendering
-  const maxChart = Math.max(...chartData.map((d) => d.views + d.likes + d.comments), 1);
+  // Per-recipe comments for top commented
+  const recipeCommentCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    filteredComments.forEach((c) => {
+      counts[c.recipe_id] = (counts[c.recipe_id] || 0) + 1;
+    });
+    return counts;
+  }, [filteredComments]);
+
+  const topCommented = useMemo(() => {
+    return [...recipes]
+      .map((r) => ({ ...r, commentsCount: recipeCommentCounts[r.id] || 0 }))
+      .sort((a, b) => b.commentsCount - a.commentsCount)
+      .filter((r) => r.commentsCount > 0)
+      .slice(0, 5);
+  }, [recipes, recipeCommentCounts]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -250,28 +239,19 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        {/* Chart */}
+        {/* Views Chart */}
         <div className={styles.chartSection}>
-          <h2>Activity Over Time</h2>
-          <div className={styles.chartLegend}>
-            <span className={styles.legendItem}><span className={styles.legendDotViews}></span> Views</span>
-            <span className={styles.legendItem}><span className={styles.legendDotLikes}></span> Likes</span>
-            <span className={styles.legendItem}><span className={styles.legendDotComments}></span> Comments</span>
-          </div>
+          <h2>&#128065; Views Over Time</h2>
           <div className={styles.chart}>
             {chartData.length > 0 ? (
               <div className={styles.chartBars}>
                 {chartData.map((d, i) => {
                   const viewsH = (d.views / maxChart) * 100;
-                  const likesH = (d.likes / maxChart) * 100;
-                  const commentsH = (d.comments / maxChart) * 100;
                   const showLabel = chartData.length <= 14 || i % Math.ceil(chartData.length / 14) === 0;
                   return (
-                    <div key={d.date} className={styles.chartBarGroup} title={`${d.date}: ${d.views} views, ${d.likes} likes, ${d.comments} comments`}>
+                    <div key={d.date} className={styles.chartBarGroup} title={`${d.date}: ${d.views} views`}>
                       <div className={styles.chartBarStack}>
                         {d.views > 0 && <div className={styles.chartBarViews} style={{ height: `${viewsH}%` }}></div>}
-                        {d.likes > 0 && <div className={styles.chartBarLikes} style={{ height: `${likesH}%` }}></div>}
-                        {d.comments > 0 && <div className={styles.chartBarComments} style={{ height: `${commentsH}%` }}></div>}
                       </div>
                       {showLabel && <span className={styles.chartLabel}>{d.date.slice(5)}</span>}
                     </div>
@@ -279,29 +259,13 @@ export default function AnalyticsPage() {
                 })}
               </div>
             ) : (
-              <p className={styles.noData}>No activity data for this period.</p>
+              <p className={styles.noData}>No views data for this period.</p>
             )}
           </div>
         </div>
 
-        {/* Top recipes */}
+        {/* Rankings */}
         <div className={styles.twoCol}>
-          <div className={styles.rankSection}>
-            <h2>&#128293; Most Viewed</h2>
-            {topRecipes.length === 0 ? (
-              <p className={styles.noData}>No views yet.</p>
-            ) : (
-              <ol className={styles.rankList}>
-                {topRecipes.map((r, i) => (
-                  <li key={r.id}>
-                    <span className={styles.rankNum}>{i + 1}</span>
-                    <Link href={`/recipe/${r.id}`} className={styles.rankName}>{r.name}</Link>
-                    <span className={styles.rankStat}>&#128065; {r.view_count || 0}</span>
-                  </li>
-                ))}
-              </ol>
-            )}
-          </div>
           <div className={styles.rankSection}>
             <h2>&#10084; Most Liked</h2>
             {topLiked.length === 0 ? (
@@ -313,6 +277,22 @@ export default function AnalyticsPage() {
                     <span className={styles.rankNum}>{i + 1}</span>
                     <Link href={`/recipe/${r.id}`} className={styles.rankName}>{r.name}</Link>
                     <span className={styles.rankStat}>&#10084; {r.likes}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+          <div className={styles.rankSection}>
+            <h2>&#128172; Most Comments</h2>
+            {topCommented.length === 0 ? (
+              <p className={styles.noData}>No comments yet.</p>
+            ) : (
+              <ol className={styles.rankList}>
+                {topCommented.map((r, i) => (
+                  <li key={r.id}>
+                    <span className={styles.rankNum}>{i + 1}</span>
+                    <Link href={`/recipe/${r.id}`} className={styles.rankName}>{r.name}</Link>
+                    <span className={styles.rankStat}>&#128172; {r.commentsCount}</span>
                   </li>
                 ))}
               </ol>
