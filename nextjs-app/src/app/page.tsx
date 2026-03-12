@@ -29,14 +29,7 @@ function HomeContent() {
   const filteredRecipes = useMemo(() => {
     let filtered = recipes;
 
-    // Category / favorites filter
-    if (currentFilter === 'favorites') {
-      filtered = filtered.filter((r) => favorites.has(r.id));
-    } else if (currentFilter !== 'all') {
-      filtered = filtered.filter((r) => r.category === currentFilter);
-    }
-
-    // Search filter
+    // When searching, search across ALL recipes regardless of tab
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -45,6 +38,13 @@ function HomeContent() {
           r.description.toLowerCase().includes(q) ||
           r.category.toLowerCase().includes(q)
       );
+    } else {
+      // Only apply category/favorites filter when not searching
+      if (currentFilter === 'favorites') {
+        filtered = filtered.filter((r) => favorites.has(r.id));
+      } else if (currentFilter !== 'all') {
+        filtered = filtered.filter((r) => r.category === currentFilter);
+      }
     }
 
     // Sort alphabetically by name
