@@ -1,35 +1,58 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-
-const STORAGE_KEY = 'apop_favorites';
+import { supabase } from '@/lib/supabase';
+import { getBrowserFingerprint } from '@/lib/fingerprint';
 
 export function useFavorites() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
+  // Load all liked recipe IDs for this browser from Supabase
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        setFavorites(new Set(JSON.parse(saved)));
+    const fetchFavorites = async () => {
+      const fingerprint = getBrowserFingerprint();
+      const { data } = await supabase
+        .from('recipe_likes')
+        .select('recipe_id')
+        .eq('browser_fingerprint', fingerprint);
+
+      if (data) {
+        setFavorites(new Set(data.map((row: any) => row.recipe_id)));
       }
-    } catch {}
+    };
+
+    fetchFavorites();
   }, []);
 
-  const toggleFavorite = useCallback((id: string) => {
+  const toggleFavorite = useCallback(async (id: string) => {
+    const fingerprint = getBrowserFingerprint();
+    const wasLiked = favorites.has(id);
+
+    // Optimistically update UI
     setFavorites((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) {
+      if (wasLiked) {
         next.delete(id);
       } else {
         next.add(id);
       }
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(next)));
-      } catch {}
       return next;
     });
-  }, []);
+
+    // Sync with Supabase
+    if (wasLiked) {
+      await supabase
+        .from('recipe_likes')
+        .delete()
+        .eq('recipe_id', id)
+        .eq('browser_fingerprint', fingerprint);
+    } else {
+      await supabase.from('recipe_likes').insert({
+        recipe_id: id,
+        browser_fingerprint: fingerprint,
+      });
+    }
+  }, [favorites]);
 
   const isFavorite = useCallback(
     (id: string) => favorites.has(id),
