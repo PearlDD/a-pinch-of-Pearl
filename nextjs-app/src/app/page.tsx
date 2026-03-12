@@ -24,6 +24,33 @@ function HomeContent() {
   const initialFilter = searchParams.get('filter') || 'all';
   const [currentFilter, setCurrentFilter] = useState(initialFilter);
   const [searchQuery, setSearchQuery] = useState('');
+  const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
+
+  // Fetch like & comment counts for admin overlay
+  useEffect(() => {
+    if (!isAdmin || recipes.length === 0) return;
+    const fetchStats = async () => {
+      const { data: likesData } = await supabase
+        .from('recipe_likes')
+        .select('recipe_id');
+      const likes: Record<string, number> = {};
+      (likesData || []).forEach((row: any) => {
+        likes[row.recipe_id] = (likes[row.recipe_id] || 0) + 1;
+      });
+      setLikeCounts(likes);
+
+      const { data: commentsData } = await supabase
+        .from('recipe_comments')
+        .select('recipe_id');
+      const comments: Record<string, number> = {};
+      (commentsData || []).forEach((row: any) => {
+        comments[row.recipe_id] = (comments[row.recipe_id] || 0) + 1;
+      });
+      setCommentCounts(comments);
+    };
+    fetchStats();
+  }, [isAdmin, recipes]);
 
   useEffect(() => {
     const urlFilter = searchParams.get('filter') || 'all';
@@ -121,6 +148,8 @@ function HomeContent() {
           <div className={adminStyles.adminOverlay}>
             <div className={adminStyles.adminStats}>
               <span title="Views">&#128065; {recipe.view_count || 0}</span>
+              <span title="Likes">&#10084; {likeCounts[recipe.id] || 0}</span>
+              <span title="Comments">&#128172; {commentCounts[recipe.id] || 0}</span>
             </div>
             <div className={adminStyles.adminActions}>
               <Link
@@ -173,6 +202,9 @@ function HomeContent() {
               </span>
             </div>
             <div className={adminStyles.adminBarRight}>
+              <Link href="/admin/analytics" className="btn">
+                &#128202; Dashboard
+              </Link>
               <Link href="/admin/recipes/new" className="btn btn-primary">
                 &#43; Add Recipe
               </Link>
