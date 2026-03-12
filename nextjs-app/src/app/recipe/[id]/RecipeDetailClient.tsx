@@ -10,6 +10,7 @@ import LikeButton from '@/components/LikeButton';
 import CommentSection from '@/components/CommentSection';
 import Footer from '@/components/Footer';
 import headerStyles from '@/components/Header.module.css';
+import adminStyles from '@/app/admin/admin.module.css';
 import styles from './RecipeDetail.module.css';
 
 interface RecipeDetailClientProps {
@@ -21,8 +22,19 @@ export default function RecipeDetailClient({
 }: RecipeDetailClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAdmin } = useAuth();
+  const { isAdmin, signOut } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
+
+  const handleAdminDelete = async () => {
+    if (!confirm(`Are you sure you want to delete "${recipe.name}"?`)) return;
+    await supabase.from('recipes').delete().eq('id', recipe.id);
+    router.push('/admin');
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push('/');
+  };
 
   // Determine where to go back to
   const fromFilter = searchParams.get('from');
@@ -111,6 +123,34 @@ export default function RecipeDetailClient({
           </nav>
         </div>
       </header>
+
+      {/* Admin toolbar */}
+      {isAdmin && (
+        <div className={adminStyles.adminBar}>
+          <div className={adminStyles.adminBarInner}>
+            <div className={adminStyles.adminBarLeft}>
+              <span className={adminStyles.adminBadge}>Pearl Mode</span>
+              <span className={adminStyles.statsRow}>
+                <span>&#128065; {recipe.view_count || 0} views</span>
+              </span>
+            </div>
+            <div className={adminStyles.adminBarRight}>
+              <Link href="/admin" className="btn">
+                &larr; Admin Home
+              </Link>
+              <Link href={`/admin/recipes/${recipe.id}/edit`} className="btn btn-primary">
+                &#9998; Edit
+              </Link>
+              <button className="btn" style={{ color: '#c0392b' }} onClick={handleAdminDelete}>
+                &#128465; Delete
+              </button>
+              <button className="btn" onClick={handleSignOut}>
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <article className={styles.article}>
         {/* Hero image */}
