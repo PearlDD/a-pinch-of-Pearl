@@ -37,6 +37,7 @@ export const CATEGORIES = [
   'Flour-Based Food',
   'Dessert',
   'Beverage',
+  'Cholesterol Friendly',
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];
