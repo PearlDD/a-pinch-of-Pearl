@@ -123,7 +123,7 @@ export default function EditRecipePage() {
         setCookTime(data.cook_time || '');
         setServings(data.servings || '');
         setIngredientsList(data.ingredients ? data.ingredients.split('\n').filter((s: string) => s.trim()) : []);
-        setInstructionsList(data.instructions ? data.instructions.split('\n').filter((s: string) => s.trim()) : []);
+        setInstructionsList(data.instructions ? data.instructions.split('\n').filter((s: string) => s.trim()).map((s: string) => s.replace(/^\d+\.\s*/, '')) : []);
         setTipsList(data.tips ? data.tips.split('\n').filter((s: string) => s.trim()) : []);
         setPhotoUrl(data.photo_url || '');
         setPhotos(data.photos || '');
