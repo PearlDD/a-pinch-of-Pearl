@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
 import { uploadPhoto } from '@/lib/uploadPhoto';
 import { CATEGORIES, Recipe } from '@/lib/types';
+import ListInput from '@/components/ListInput';
 import styles from '../../new/recipeForm.module.css';
 
 export default function EditRecipePage() {
@@ -24,9 +25,9 @@ export default function EditRecipePage() {
   const [prepTime, setPrepTime] = useState('');
   const [cookTime, setCookTime] = useState('');
   const [servings, setServings] = useState('');
-  const [ingredients, setIngredients] = useState('');
-  const [instructions, setInstructions] = useState('');
-  const [tips, setTips] = useState('');
+  const [ingredientsList, setIngredientsList] = useState<string[]>([]);
+  const [instructionsList, setInstructionsList] = useState<string[]>([]);
+  const [tipsList, setTipsList] = useState<string[]>([]);
   const [photoUrl, setPhotoUrl] = useState('');
   const [photos, setPhotos] = useState('');
   const [sourceUrl, setSourceUrl] = useState('');
@@ -121,9 +122,9 @@ export default function EditRecipePage() {
         setPrepTime(data.prep_time || '');
         setCookTime(data.cook_time || '');
         setServings(data.servings || '');
-        setIngredients(data.ingredients || '');
-        setInstructions(data.instructions || '');
-        setTips(data.tips || '');
+        setIngredientsList(data.ingredients ? data.ingredients.split('\n').filter((s: string) => s.trim()) : []);
+        setInstructionsList(data.instructions ? data.instructions.split('\n').filter((s: string) => s.trim()) : []);
+        setTipsList(data.tips ? data.tips.split('\n').filter((s: string) => s.trim()) : []);
         setPhotoUrl(data.photo_url || '');
         setPhotos(data.photos || '');
         setSourceUrl(data.source_url || '');
@@ -154,9 +155,9 @@ export default function EditRecipePage() {
         prep_time: prepTime.trim(),
         cook_time: cookTime.trim(),
         servings: servings.trim(),
-        ingredients: ingredients.trim(),
-        instructions: instructions.trim(),
-        tips: tips.trim(),
+        ingredients: ingredientsList.join('\n'),
+        instructions: instructionsList.join('\n'),
+        tips: tipsList.join('\n'),
         photo_url: photoUrl.trim(),
         photos: photos.trim(),
         source_url: sourceUrl.trim(),
@@ -255,31 +256,29 @@ export default function EditRecipePage() {
 
           <div className={styles.formGroup}>
             <label>Ingredients</label>
-            <textarea
-              value={ingredients}
-              onChange={(e) => setIngredients(e.target.value)}
-              placeholder={"One ingredient per line"}
-              rows={6}
+            <ListInput
+              items={ingredientsList}
+              onChange={setIngredientsList}
+              placeholder="e.g. 2 cups flour"
             />
           </div>
 
           <div className={styles.formGroup}>
             <label>Instructions</label>
-            <textarea
-              value={instructions}
-              onChange={(e) => setInstructions(e.target.value)}
-              placeholder={"One step per line"}
-              rows={6}
+            <ListInput
+              items={instructionsList}
+              onChange={setInstructionsList}
+              placeholder="e.g. Preheat oven to 350°F"
+              numbered
             />
           </div>
 
           <div className={styles.formGroup}>
             <label>Tips (optional)</label>
-            <textarea
-              value={tips}
-              onChange={(e) => setTips(e.target.value)}
-              placeholder={"One tip per line"}
-              rows={3}
+            <ListInput
+              items={tipsList}
+              onChange={setTipsList}
+              placeholder="e.g. Use room temperature eggs"
             />
           </div>
 

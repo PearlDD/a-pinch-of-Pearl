@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
 import { uploadPhoto } from '@/lib/uploadPhoto';
 import { CATEGORIES } from '@/lib/types';
+import ListInput from '@/components/ListInput';
 import styles from './recipeForm.module.css';
 
 export default function AddRecipePage() {
@@ -21,9 +22,9 @@ export default function AddRecipePage() {
   const [prepTime, setPrepTime] = useState('');
   const [cookTime, setCookTime] = useState('');
   const [servings, setServings] = useState('');
-  const [ingredients, setIngredients] = useState('');
-  const [instructions, setInstructions] = useState('');
-  const [tips, setTips] = useState('');
+  const [ingredientsList, setIngredientsList] = useState<string[]>([]);
+  const [instructionsList, setInstructionsList] = useState<string[]>([]);
+  const [tipsList, setTipsList] = useState<string[]>([]);
   const [photoUrl, setPhotoUrl] = useState('');
   const [photos, setPhotos] = useState('');
   const [sourceUrl, setSourceUrl] = useState('');
@@ -120,9 +121,9 @@ export default function AddRecipePage() {
       prep_time: prepTime.trim(),
       cook_time: cookTime.trim(),
       servings: servings.trim(),
-      ingredients: ingredients.trim(),
-      instructions: instructions.trim(),
-      tips: tips.trim(),
+      ingredients: ingredientsList.join('\n'),
+      instructions: instructionsList.join('\n'),
+      tips: tipsList.join('\n'),
       photo_url: photoUrl.trim(),
       photos: photos.trim(),
       source_url: sourceUrl.trim(),
@@ -219,31 +220,29 @@ export default function AddRecipePage() {
 
           <div className={styles.formGroup}>
             <label>Ingredients</label>
-            <textarea
-              value={ingredients}
-              onChange={(e) => setIngredients(e.target.value)}
-              placeholder={"One ingredient per line, e.g.:\n2 cups flour\n1 tsp salt\n3 eggs"}
-              rows={6}
+            <ListInput
+              items={ingredientsList}
+              onChange={setIngredientsList}
+              placeholder="e.g. 2 cups flour"
             />
           </div>
 
           <div className={styles.formGroup}>
             <label>Instructions</label>
-            <textarea
-              value={instructions}
-              onChange={(e) => setInstructions(e.target.value)}
-              placeholder={"One step per line, e.g.:\nPreheat oven to 350\u00B0F\nMix dry ingredients\nAdd wet ingredients and stir"}
-              rows={6}
+            <ListInput
+              items={instructionsList}
+              onChange={setInstructionsList}
+              placeholder="e.g. Preheat oven to 350°F"
+              numbered
             />
           </div>
 
           <div className={styles.formGroup}>
             <label>Tips (optional)</label>
-            <textarea
-              value={tips}
-              onChange={(e) => setTips(e.target.value)}
-              placeholder={"One tip per line, e.g.:\nUse room temperature eggs\nDon't overmix the batter"}
-              rows={3}
+            <ListInput
+              items={tipsList}
+              onChange={setTipsList}
+              placeholder="e.g. Use room temperature eggs"
             />
           </div>
 
