@@ -157,6 +157,16 @@ export default function RecipeDetailClient({
       )}
 
       <article className={styles.article}>
+        <div className={styles.content}>
+          <Link href={backHref} className={styles.backLink}>
+            &larr; Back to recipes
+          </Link>
+
+          <Link href={`/?filter=${encodeURIComponent(recipe.category)}`} className={styles.category}>
+            {recipe.category}
+          </Link>
+        </div>
+
         {/* Hero image */}
         <div className={styles.heroImage}>
           {recipe.photo_url ? (
@@ -175,13 +185,6 @@ export default function RecipeDetailClient({
         </div>
 
         <div className={styles.content}>
-          <Link href={backHref} className={styles.backLink}>
-            &larr; Back to recipes
-          </Link>
-
-          <Link href={`/?filter=${encodeURIComponent(recipe.category)}`} className={styles.category}>
-            {recipe.category}
-          </Link>
           <h1>{recipe.name}</h1>
           {recipe.description && (
             <p className={styles.description}>{recipe.description}</p>
