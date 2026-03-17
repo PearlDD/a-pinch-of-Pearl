@@ -157,11 +157,10 @@ export default function RecipeDetailClient({
       )}
 
       <article className={styles.article}>
-        <div className={styles.content}>
+        <div className={styles.navRow}>
           <Link href={backHref} className={styles.backLink}>
             &larr; Back to recipes
           </Link>
-
           <Link href={`/?filter=${encodeURIComponent(recipe.category)}`} className={styles.category}>
             {recipe.category}
           </Link>

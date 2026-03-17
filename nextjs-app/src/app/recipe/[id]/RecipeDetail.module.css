@@ -19,6 +19,21 @@
   margin: 0 auto;
 }
 
+.navRow {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1.2rem 2.5rem 0.5rem;
+}
+
+.navRow .backLink {
+  margin-bottom: 0;
+}
+
+.navRow .category {
+  margin-bottom: 0;
+}
+
 .heroImage {
   width: 100%;
   max-height: 500px;
