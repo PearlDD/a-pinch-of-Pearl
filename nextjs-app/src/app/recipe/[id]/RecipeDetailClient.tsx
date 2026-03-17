@@ -22,7 +22,7 @@ export default function RecipeDetailClient({
 }: RecipeDetailClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAdmin, signOut } = useAuth();
+  const { isAdmin, loading: authLoading, signOut } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleAdminDelete = async () => {
@@ -42,15 +42,22 @@ export default function RecipeDetailClient({
     ? `/?filter=${encodeURIComponent(fromFilter)}`
     : '/';
 
-  // Track view count (skip for admin)
+  // Track view count (skip for admin, wait for auth to finish loading)
   useEffect(() => {
+    if (authLoading) return;
     if (isAdmin) return;
+    // Increment the counter
     supabase
       .from('recipes')
       .update({ view_count: (recipe.view_count || 0) + 1 })
       .eq('id', recipe.id)
       .then();
-  }, [recipe.id, recipe.view_count, isAdmin]);
+    // Log timestamped view for analytics
+    supabase
+      .from('recipe_views')
+      .insert({ recipe_id: recipe.id })
+      .then();
+  }, [recipe.id, recipe.view_count, isAdmin, authLoading]);
 
   const ingredients = recipe.ingredients
     ? recipe.ingredients.split('\n').filter((l) => l.trim())
