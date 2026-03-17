@@ -30,6 +30,33 @@
   font-size: 0.9rem;
   color: var(--text-dark);
   line-height: 1.4;
+  cursor: text;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.itemText:hover {
+  background: var(--soft-peach);
+}
+
+.editRow {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.editInput {
+  flex: 1;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--accent-terracotta);
+  border-radius: 6px;
+  font-family: 'Lora', serif;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  background: #fff;
+  outline: none;
 }
 
 .itemNum {
