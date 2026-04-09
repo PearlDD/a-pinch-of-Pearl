@@ -11,13 +11,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 All commands run from `nextjs-app/`:
 
 ```bash
-npm run dev      # Local dev server
-npm run build    # Production build
-npm run lint     # ESLint (next lint)
-npm start        # Production server
+npm run dev            # Local dev server
+npm run build          # Production build
+npm run lint           # ESLint (next lint)
+npm start              # Production server
+npm test               # Jest unit/component tests
+npm run test:watch     # Jest in watch mode
+npm run test:coverage  # Jest with coverage
+npm run test:e2e       # Playwright end-to-end tests
+npm run test:e2e:ui    # Playwright UI mode
 ```
 
-No test framework is configured.
+## Testing
+
+- **Unit / component**: Jest + React Testing Library, configured via `next/jest` so transforms (SWC), CSS modules, `next/font`, and `.env*` loading match the production build. Tests live alongside source as `*.test.tsx` or under `__tests__/`. Shared setup at `src/__tests__/setup.ts` registers `@testing-library/jest-dom` and the global mocks in `src/__tests__/mocks/` (`next-navigation`, `supabase`).
+- **End-to-end**: Playwright (`playwright.config.ts`, specs in `e2e/`). The runner boots `npm run dev`, which loads the home page client component — so a populated `.env.local` with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` is required to run the E2E suite. CI must provide the same vars as secrets.
 
 ## Architecture
 

@@ -70,7 +70,7 @@ describe('RecipeCard', () => {
       />
     );
 
-    await user.click(screen.getByRole('button'));
+    await user.click(screen.getByRole('button', { name: /favorite/i }));
     expect(mockToggleFavorite).toHaveBeenCalledWith('1');
   });
 
@@ -85,7 +85,7 @@ describe('RecipeCard', () => {
       />
     );
 
-    await user.click(screen.getByRole('button'));
+    await user.click(screen.getByRole('button', { name: /favorite/i }));
     expect(mockOnClick).not.toHaveBeenCalled();
   });
 });

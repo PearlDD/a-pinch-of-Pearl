@@ -38,7 +38,10 @@ export default function RecipeCard({
           &#127858;
         </span>
         <button
+          type="button"
           className={`${styles.favoriteBtn} ${isFavorite ? styles.favorited : ''}`}
+          aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          aria-pressed={isFavorite}
           onClick={(e) => {
             e.stopPropagation();
             onToggleFavorite(recipe.id);
