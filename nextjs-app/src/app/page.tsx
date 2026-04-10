@@ -11,7 +11,7 @@ import { useRecipes } from '@/hooks/useRecipes';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
-import { Recipe, CATEGORIES } from '@/lib/types';
+import { Recipe, CATEGORIES, parseCategories } from '@/lib/types';
 import adminStyles from '@/app/admin/admin.module.css';
 import styles from './page.module.css';
 
@@ -72,7 +72,9 @@ function HomeContent() {
       if (currentFilter === 'favorites') {
         filtered = filtered.filter((r) => favorites.has(r.id));
       } else if (currentFilter !== 'all') {
-        filtered = filtered.filter((r) => r.category === currentFilter);
+        filtered = filtered.filter((r) =>
+          parseCategories(r.category).includes(currentFilter)
+        );
       }
     }
 
@@ -83,13 +85,17 @@ function HomeContent() {
     if (currentFilter !== 'all' || searchQuery.trim()) return null;
     const groups: { category: string; recipes: Recipe[] }[] = [];
     for (const cat of CATEGORIES) {
-      const catRecipes = filteredRecipes.filter((r) => r.category === cat);
+      const catRecipes = filteredRecipes.filter((r) =>
+        parseCategories(r.category).includes(cat)
+      );
       if (catRecipes.length > 0) {
         groups.push({ category: cat, recipes: catRecipes });
       }
     }
     const knownCats = new Set(CATEGORIES as readonly string[]);
-    const otherRecipes = filteredRecipes.filter((r) => !knownCats.has(r.category));
+    const otherRecipes = filteredRecipes.filter(
+      (r) => !parseCategories(r.category).some((c) => knownCats.has(c))
+    );
     if (otherRecipes.length > 0) {
       groups.push({ category: 'Other', recipes: otherRecipes });
     }

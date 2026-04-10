@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Recipe, CATEGORIES } from '@/lib/types';
+import { Recipe, CATEGORIES, parseCategories } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import LikeButton from '@/components/LikeButton';
@@ -115,7 +115,7 @@ export default function RecipeDetailClient({
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
-                className={recipe.category === cat ? headerStyles.active : ''}
+                className={parseCategories(recipe.category).includes(cat) ? headerStyles.active : ''}
                 onClick={() => handleFilterChange(cat)}
               >
                 {cat}

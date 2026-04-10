@@ -23,6 +23,11 @@ npm-debug.log*
 # local env files
 .env*.local
 
+# playwright
+/e2e/test-results/
+/playwright-report/
+/test-results/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

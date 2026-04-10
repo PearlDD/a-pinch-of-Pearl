@@ -1,6 +1,6 @@
 'use client';
 
-import { Recipe } from '@/lib/types';
+import { Recipe, parseCategories } from '@/lib/types';
 import styles from './RecipeModal.module.css';
 
 interface RecipeModalProps {
@@ -41,7 +41,11 @@ export default function RecipeModal({ recipe, onClose }: RecipeModalProps) {
         </div>
 
         <div className={styles.modalBody}>
-          <span className={styles.category}>{recipe.category}</span>
+          <div className={styles.categoryList}>
+            {parseCategories(recipe.category).map((cat) => (
+              <span key={cat} className={styles.category}>{cat}</span>
+            ))}
+          </div>
           <h2>{recipe.name}</h2>
           {recipe.description && (
             <p className={styles.description}>{recipe.description}</p>

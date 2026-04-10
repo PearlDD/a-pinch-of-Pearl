@@ -203,6 +203,39 @@
   margin: 0;
 }
 
+.checkboxGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: 'Lora', serif;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  cursor: pointer;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--border-warm);
+  border-radius: 10px;
+  background: var(--warm-cream);
+  transition: border-color 0.2s, background 0.2s;
+  user-select: none;
+}
+
+.checkboxLabel:has(input:checked) {
+  border-color: var(--accent-terracotta);
+  background: var(--soft-peach);
+}
+
+.checkboxLabel input[type="checkbox"] {
+  width: auto;
+  accent-color: var(--accent-terracotta);
+  cursor: pointer;
+}
+
 @media (max-width: 768px) {
   .formRow { grid-template-columns: 1fr; }
 }
