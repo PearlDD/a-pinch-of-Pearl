@@ -152,10 +152,17 @@ function HomeContent() {
             onClick={handleRecipeClick}
           />
           <div className={adminStyles.adminOverlay}>
-            <div className={adminStyles.adminStats}>
-              <span title="Views">&#128065; {recipe.view_count || 0}</span>
-              <span title="Likes">&#10084; {likeCounts[recipe.id] || 0}</span>
-              <span title="Comments">&#128172; {commentCounts[recipe.id] || 0}</span>
+            <div className={adminStyles.adminOverlayContent}>
+              <div className={adminStyles.adminCategories}>
+                {parseCategories(recipe.category).map((cat) => (
+                  <span key={cat} className={adminStyles.adminCategoryBadge}>{cat}</span>
+                ))}
+              </div>
+              <div className={adminStyles.adminStats}>
+                <span title="Views">&#128065; {recipe.view_count || 0}</span>
+                <span title="Likes">&#10084; {likeCounts[recipe.id] || 0}</span>
+                <span title="Comments">&#128172; {commentCounts[recipe.id] || 0}</span>
+              </div>
             </div>
             <div className={adminStyles.adminActions}>
               <Link

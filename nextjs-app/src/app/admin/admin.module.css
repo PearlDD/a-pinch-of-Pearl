@@ -82,6 +82,30 @@
   pointer-events: auto;
 }
 
+.adminOverlayContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.adminCategories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.adminCategoryBadge {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.95);
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
 .adminStats {
   display: flex;
   gap: 0.6rem;
