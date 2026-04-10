@@ -42,3 +42,11 @@ export const CATEGORIES = [
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];
+
+export function parseCategories(category: string): string[] {
+  return category.split(',').map((s) => s.trim()).filter(Boolean);
+}
+
+export function formatCategories(categories: string[]): string {
+  return categories.join(', ');
+}

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
 import { uploadPhoto } from '@/lib/uploadPhoto';
-import { CATEGORIES, Recipe } from '@/lib/types';
+import { CATEGORIES, Recipe, parseCategories, formatCategories } from '@/lib/types';
 import ListInput from '@/components/ListInput';
 import styles from '../../new/recipeForm.module.css';
 
@@ -20,7 +20,7 @@ export default function EditRecipePage() {
   const [error, setError] = useState('');
 
   const [name, setName] = useState('');
-  const [category, setCategory] = useState<string>(CATEGORIES[0]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([CATEGORIES[0]]);
   const [description, setDescription] = useState('');
   const [prepTime, setPrepTime] = useState('');
   const [cookTime, setCookTime] = useState('');
@@ -117,7 +117,7 @@ export default function EditRecipePage() {
 
       if (data) {
         setName(data.name || '');
-        setCategory(data.category || CATEGORIES[0]);
+        setSelectedCategories(data.category ? parseCategories(data.category) : [CATEGORIES[0]]);
         setDescription(data.description || '');
         setPrepTime(data.prep_time || '');
         setCookTime(data.cook_time || '');
@@ -143,6 +143,10 @@ export default function EditRecipePage() {
       setError('Recipe name is required.');
       return;
     }
+    if (selectedCategories.length === 0) {
+      setError('Select at least one category.');
+      return;
+    }
 
     setSaving(true);
 
@@ -150,7 +154,7 @@ export default function EditRecipePage() {
       .from('recipes')
       .update({
         name: name.trim(),
-        category,
+        category: formatCategories(selectedCategories),
         description: description.trim(),
         prep_time: prepTime.trim(),
         cook_time: cookTime.trim(),
@@ -205,12 +209,28 @@ export default function EditRecipePage() {
           </div>
 
           <div className={styles.formGroup}>
-            <label>Category *</label>
-            <select value={category} onChange={(e) => setCategory(e.target.value)}>
+            <label>Categories *</label>
+            <div className={styles.checkboxGroup}>
               {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
+                <label key={cat} className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories.includes(cat)}
+                    onChange={(e) => {
+                      setSelectedCategories((prev) =>
+                        e.target.checked
+                          ? [...prev, cat]
+                          : prev.filter((c) => c !== cat)
+                      );
+                    }}
+                  />
+                  {cat}
+                </label>
               ))}
-            </select>
+            </div>
+            {selectedCategories.length === 0 && (
+              <span className={styles.hint} style={{ color: '#c0392b' }}>Select at least one category</span>
+            )}
           </div>
 
           <div className={styles.formGroup}>

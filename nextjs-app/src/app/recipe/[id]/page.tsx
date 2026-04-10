@@ -24,7 +24,7 @@ export async function generateMetadata({
   }
 
   const description =
-    recipe.description || `A delicious ${recipe.category} recipe from A Pinch of Pearl`;
+    recipe.description || `A delicious ${recipe.category.split(',')[0].trim()} recipe from A Pinch of Pearl`;
 
   return {
     title: `${recipe.name} — A Pinch of Pearl`,
