@@ -24,26 +24,6 @@ export default function RecipeDetailClient({
   const searchParams = useSearchParams();
   const { isAdmin, loading: authLoading, signOut } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [copied, setCopied] = useState(false);
-
-  const handleShare = async () => {
-    const url = window.location.href;
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: recipe.name,
-          text: recipe.description || `Check out this recipe from A Pinch of Pearl`,
-          url,
-        });
-      } catch {
-        // User cancelled or share failed — ignore
-      }
-    } else {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
 
   const handleAdminDelete = async () => {
     if (!confirm(`Are you sure you want to delete "${recipe.name}"?`)) return;
@@ -300,12 +280,6 @@ export default function RecipeDetailClient({
               onClick={() => window.print()}
             >
               &#128424; Print Recipe
-            </button>
-            <button
-              className="btn"
-              onClick={handleShare}
-            >
-              {copied ? '&#10003; Link Copied!' : '&#128279; Share Recipe'}
             </button>
           </div>
 
