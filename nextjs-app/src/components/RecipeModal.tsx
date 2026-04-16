@@ -14,6 +14,18 @@ export default function RecipeModal({ recipe, onClose }: RecipeModalProps) {
   const ingredients = recipe.ingredients
     ? recipe.ingredients.split('\n').filter((l) => l.trim())
     : [];
+
+  const renderIngredient = (text: string) => {
+    const urlMatch = text.match(/(https?:\/\/[^\s]+)/);
+    if (!urlMatch) return text;
+    const url = urlMatch[1];
+    const label = text.replace(url, '').trim();
+    return (
+      <a href={url} target="_blank" rel="noopener noreferrer">
+        {label || url}
+      </a>
+    );
+  };
   const instructions = recipe.instructions
     ? recipe.instructions.split('\n').filter((l) => l.trim())
     : [];
@@ -77,7 +89,7 @@ export default function RecipeModal({ recipe, onClose }: RecipeModalProps) {
               <h3>Ingredients</h3>
               <ul className={styles.ingredientsList}>
                 {ingredients.map((item, i) => (
-                  <li key={i}>{item}</li>
+                  <li key={i}>{renderIngredient(item)}</li>
                 ))}
               </ul>
             </div>
