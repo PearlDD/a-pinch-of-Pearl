@@ -16,14 +16,22 @@ export default function RecipeModal({ recipe, onClose }: RecipeModalProps) {
     : [];
 
   const renderIngredient = (text: string) => {
-    const urlMatch = text.match(/(https?:\/\/[^\s]+)/);
-    if (!urlMatch) return text;
-    const url = urlMatch[1];
-    const label = text.replace(url, '').trim();
+    const parts = text.split(/(\[[^\]]+\]\([^)]+\))/);
+    if (parts.length === 1) return text;
     return (
-      <a href={url} target="_blank" rel="noopener noreferrer">
-        {label || url}
-      </a>
+      <>
+        {parts.map((part, i) => {
+          const match = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+          if (match) {
+            return (
+              <a key={i} href={match[2]} target="_blank" rel="noopener noreferrer">
+                {match[1]}
+              </a>
+            );
+          }
+          return part;
+        })}
+      </>
     );
   };
   const instructions = recipe.instructions
