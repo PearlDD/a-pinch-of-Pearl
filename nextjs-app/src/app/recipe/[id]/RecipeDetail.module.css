@@ -168,6 +168,16 @@
   color: var(--text-medium);
 }
 
+.ingredientsList li a {
+  color: var(--accent-terracotta);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ingredientsList li a:hover {
+  opacity: 0.8;
+}
+
 .ingredientsList li::before {
   content: "\2022";
   color: var(--accent-terracotta);
