@@ -64,12 +64,12 @@ export default function RecipeDetailClient({
     : [];
 
   const renderIngredient = (text: string) => {
-    const parts = text.split(/(\[[^\]]+\]\([^)]+\))/);
+    const parts = text.split(/(\[[^\]]+\]\s*\([^)]+\))/);
     if (parts.length === 1) return text;
     return (
       <>
         {parts.map((part, i) => {
-          const match = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+          const match = part.match(/^\[([^\]]+)\]\s*\(([^)]+)\)$/);
           if (match) {
             return (
               <a key={i} href={match[2]} target="_blank" rel="noopener noreferrer">
