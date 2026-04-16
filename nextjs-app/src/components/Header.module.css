@@ -120,7 +120,12 @@
 }
 
 @media (max-width: 768px) {
-  .headerInner { flex-direction: column; text-align: center; }
-  .searchBar { width: 100%; }
-  .nav { justify-content: center; }
+  .header { padding: 0.6rem 0.8rem; }
+  .headerInner { flex-direction: column; text-align: center; gap: 0.4rem; }
+  .logo { font-size: 1.3rem; }
+  .searchBar { width: 100%; padding: 0.2rem 0.8rem; }
+  .searchBar input { font-size: 0.8rem; padding: 0.2rem 0.4rem; }
+  .nav { justify-content: flex-start; flex-wrap: nowrap; overflow-x: auto; width: 100%; gap: 0.25rem; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav button { font-size: 0.75rem; padding: 0.3rem 0.7rem; white-space: nowrap; flex-shrink: 0; }
 }
