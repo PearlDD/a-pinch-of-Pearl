@@ -14,11 +14,13 @@ export default function ListInput({ items, onChange, placeholder = 'Add an item.
   const [input, setInput] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState('');
-  const editRef = useRef<HTMLInputElement>(null);
+  const editRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (editingIndex !== null && editRef.current) {
       editRef.current.focus();
+      editRef.current.style.height = 'auto';
+      editRef.current.style.height = editRef.current.scrollHeight + 'px';
     }
   }, [editingIndex]);
 
@@ -97,14 +99,18 @@ export default function ListInput({ items, onChange, placeholder = 'Add an item.
               {editingIndex === i ? (
                 <div className={styles.editRow}>
                   {numbered && <span className={styles.itemNum}>{i + 1}.</span>}
-                  <input
+                  <textarea
                     ref={editRef}
-                    type="text"
                     value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
+                    onChange={(e) => {
+                      setEditValue(e.target.value);
+                      e.target.style.height = 'auto';
+                      e.target.style.height = e.target.scrollHeight + 'px';
+                    }}
                     onKeyDown={handleEditKeyDown}
                     onBlur={saveEdit}
                     className={styles.editInput}
+                    rows={1}
                   />
                 </div>
               ) : (
