@@ -25,6 +25,11 @@ export default function AddRecipePage() {
   const [ingredientsList, setIngredientsList] = useState<string[]>([]);
   const [instructionsList, setInstructionsList] = useState<string[]>([]);
   const [tipsList, setTipsList] = useState<string[]>([]);
+  const [calories, setCalories] = useState('');
+  const [carbs, setCarbs] = useState('');
+  const [protein, setProtein] = useState('');
+  const [fat, setFat] = useState('');
+  const [fiber, setFiber] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
   const [photos, setPhotos] = useState('');
   const [sourceUrl, setSourceUrl] = useState('');
@@ -131,6 +136,11 @@ export default function AddRecipePage() {
       photo_url: photoUrl.trim(),
       photos: photos.trim(),
       source_url: sourceUrl.trim(),
+      calories: calories.trim(),
+      carbs: carbs.trim(),
+      protein: protein.trim(),
+      fat: fat.trim(),
+      fiber: fiber.trim(),
     });
 
     if (dbError) {
@@ -236,6 +246,32 @@ export default function AddRecipePage() {
               onChange={(e) => setServings(e.target.value)}
               placeholder="e.g. 4"
             />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Nutrition Info (optional)</label>
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label>Calories</label>
+                <input type="text" value={calories} onChange={(e) => setCalories(e.target.value)} placeholder="e.g. 250 kcal" />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Carb</label>
+                <input type="text" value={carbs} onChange={(e) => setCarbs(e.target.value)} placeholder="e.g. 30g" />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Protein</label>
+                <input type="text" value={protein} onChange={(e) => setProtein(e.target.value)} placeholder="e.g. 15g" />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Fat</label>
+                <input type="text" value={fat} onChange={(e) => setFat(e.target.value)} placeholder="e.g. 10g" />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Fiber</label>
+                <input type="text" value={fiber} onChange={(e) => setFiber(e.target.value)} placeholder="e.g. 5g" />
+              </div>
+            </div>
           </div>
 
           <div className={styles.formGroup}>

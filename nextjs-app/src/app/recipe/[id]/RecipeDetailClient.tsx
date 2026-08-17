@@ -219,6 +219,45 @@ export default function RecipeDetailClient({
             </div>
           </div>
 
+          {/* Nutrition Info */}
+          {(recipe.calories || recipe.carbs || recipe.protein || recipe.fat || recipe.fiber) && (
+            <section className={styles.nutritionSection}>
+              <h2>Nutrition Info</h2>
+              <div className={styles.nutritionGrid}>
+                {recipe.calories && (
+                  <div className={styles.nutritionItem}>
+                    <span className={styles.nutritionValue}>{recipe.calories}</span>
+                    <span className={styles.nutritionLabel}>Calories</span>
+                  </div>
+                )}
+                {recipe.carbs && (
+                  <div className={styles.nutritionItem}>
+                    <span className={styles.nutritionValue}>{recipe.carbs}</span>
+                    <span className={styles.nutritionLabel}>Carb</span>
+                  </div>
+                )}
+                {recipe.protein && (
+                  <div className={styles.nutritionItem}>
+                    <span className={styles.nutritionValue}>{recipe.protein}</span>
+                    <span className={styles.nutritionLabel}>Protein</span>
+                  </div>
+                )}
+                {recipe.fat && (
+                  <div className={styles.nutritionItem}>
+                    <span className={styles.nutritionValue}>{recipe.fat}</span>
+                    <span className={styles.nutritionLabel}>Fat</span>
+                  </div>
+                )}
+                {recipe.fiber && (
+                  <div className={styles.nutritionItem}>
+                    <span className={styles.nutritionValue}>{recipe.fiber}</span>
+                    <span className={styles.nutritionLabel}>Fiber</span>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
+
           {/* Ingredients */}
           {ingredients.length > 0 && (
             <section className={styles.section}>

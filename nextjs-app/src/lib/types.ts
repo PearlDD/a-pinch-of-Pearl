@@ -12,6 +12,11 @@ export interface Recipe {
   photo_url: string;
   photos: string;
   source_url: string;
+  calories: string;
+  carbs: string;
+  protein: string;
+  fat: string;
+  fiber: string;
   view_count: number;
   created_at: string;
   updated_at: string;
