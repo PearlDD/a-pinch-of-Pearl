@@ -17,6 +17,11 @@ CREATE TABLE recipes (
   photo_url TEXT DEFAULT '',
   video_url TEXT DEFAULT '',
   source_url TEXT DEFAULT '',
+  calories TEXT DEFAULT '',
+  carbs TEXT DEFAULT '',
+  protein TEXT DEFAULT '',
+  fat TEXT DEFAULT '',
+  fiber TEXT DEFAULT '',
   view_count INTEGER DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
