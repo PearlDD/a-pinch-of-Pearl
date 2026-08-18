@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
 import { uploadPhoto } from '@/lib/uploadPhoto';
+import { calculateNutrition } from '@/lib/nutritionCalculator';
 import { CATEGORIES, formatCategories } from '@/lib/types';
 import ListInput from '@/components/ListInput';
 import styles from './recipeForm.module.css';
@@ -107,6 +108,16 @@ export default function AddRecipePage() {
   useEffect(() => {
     if (!authLoading && !user) router.push('/admin/login');
   }, [user, authLoading, router]);
+
+  const handleAutoNutrition = () => {
+    const servingsNum = parseInt(servings, 10) || 1;
+    const result = calculateNutrition(ingredientsList, servingsNum);
+    setCalories(result.calories);
+    setCarbs(result.carbs);
+    setProtein(result.protein);
+    setFat(result.fat);
+    setFiber(result.fiber);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -249,7 +260,24 @@ export default function AddRecipePage() {
           </div>
 
           <div className={styles.formGroup}>
+            <label>Ingredients</label>
+            <ListInput
+              items={ingredientsList}
+              onChange={setIngredientsList}
+              placeholder="e.g. 2 cups flour"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
             <label>Nutrition Info (optional)</label>
+            <button
+              type="button"
+              className={styles.autoNutritionBtn}
+              onClick={handleAutoNutrition}
+              disabled={ingredientsList.length === 0}
+            >
+              Auto-calculate Nutrition
+            </button>
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
                 <label>Calories</label>
@@ -272,15 +300,6 @@ export default function AddRecipePage() {
                 <input type="text" value={fiber} onChange={(e) => setFiber(e.target.value)} placeholder="e.g. 5g" />
               </div>
             </div>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Ingredients</label>
-            <ListInput
-              items={ingredientsList}
-              onChange={setIngredientsList}
-              placeholder="e.g. 2 cups flour"
-            />
           </div>
 
           <div className={styles.formGroup}>
