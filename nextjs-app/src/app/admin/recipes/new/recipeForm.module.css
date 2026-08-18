@@ -236,6 +236,31 @@
   cursor: pointer;
 }
 
+.autoNutritionBtn {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--accent-terracotta);
+  background: var(--soft-peach);
+  border: 1px solid var(--accent-terracotta);
+  border-radius: 8px;
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+  margin-bottom: 0.7rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.autoNutritionBtn:hover:not(:disabled) {
+  background: var(--accent-terracotta);
+  color: white;
+}
+
+.autoNutritionBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
   .formRow { grid-template-columns: 1fr; }
 }
