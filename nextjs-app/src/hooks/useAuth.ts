@@ -35,7 +35,10 @@ export function useAuth() {
       email,
       password,
     });
-    if (error) throw error;
+    if (error) {
+      console.error('[useAuth] Sign-in failed:', error.message);
+      throw error;
+    }
     return data;
   }, []);
 

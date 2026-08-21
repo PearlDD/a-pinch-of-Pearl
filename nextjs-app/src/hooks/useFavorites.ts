@@ -41,16 +41,24 @@ export function useFavorites() {
 
     // Sync with Supabase
     if (wasLiked) {
-      await supabase
+      const { error } = await supabase
         .from('recipe_likes')
         .delete()
         .eq('recipe_id', id)
         .eq('browser_fingerprint', fingerprint);
+
+      if (error) {
+        console.error('[useFavorites] Failed to remove favorite:', { recipeId: id, error: error.message });
+      }
     } else {
-      await supabase.from('recipe_likes').insert({
+      const { error } = await supabase.from('recipe_likes').insert({
         recipe_id: id,
         browser_fingerprint: fingerprint,
       });
+
+      if (error) {
+        console.error('[useFavorites] Failed to add favorite:', { recipeId: id, error: error.message });
+      }
     }
   }, [favorites]);
 

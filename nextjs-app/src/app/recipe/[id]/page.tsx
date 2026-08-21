@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@supabase/supabase-js';
 import RecipeDetailClient from './RecipeDetailClient';
+import logger from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,6 +64,8 @@ export default async function RecipeDetailPage({
     .select('*')
     .eq('id', params.id)
     .single();
+
+  logger.info({ recipeId: params.id, found: !!recipe }, 'Recipe page rendered');
 
   if (!recipe) {
     return (

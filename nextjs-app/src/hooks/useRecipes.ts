@@ -17,6 +17,7 @@ export function useRecipes() {
       .order('created_at', { ascending: false });
 
     if (error) {
+      console.error('[useRecipes] Failed to fetch recipes:', error.message);
       setError(error.message);
     } else {
       setRecipes(data || []);

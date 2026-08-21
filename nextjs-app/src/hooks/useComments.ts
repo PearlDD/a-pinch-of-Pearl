@@ -42,6 +42,7 @@ export function useComments(recipeId: string) {
         return true;
       }
 
+      console.error('[useComments] Failed to add comment:', { recipeId, error: error.message });
       setSubmitting(false);
       return false;
     },
