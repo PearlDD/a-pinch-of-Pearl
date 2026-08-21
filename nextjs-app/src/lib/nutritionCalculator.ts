@@ -576,6 +576,93 @@ const NUTRITION_DB: Record<string, NutritionPer100g> = {
   'satay sauce': { calories: 200, carbs: 15, protein: 7, fat: 13, fiber: 2 },
 };
 
+// ── Volume density lookup (g/ml) for density-aware conversions ──
+// Only includes ingredients where deviation from water density is significant (>5%).
+// Dairy near water density (milk, cream, buttermilk ≈ 1.0) intentionally omitted.
+const VOLUME_DENSITY_G_PER_ML: Record<string, number> = {
+  // Oils (~0.91-0.92 g/ml)
+  'olive oil': 0.91, 'extra virgin olive oil': 0.91,
+  'vegetable oil': 0.92, 'canola oil': 0.92, 'avocado oil': 0.91,
+  'sesame oil': 0.91, 'toasted sesame oil': 0.91, 'peanut oil': 0.91,
+  'coconut oil': 0.91, 'oil': 0.92, 'cooking oil': 0.92,
+  'lard': 0.91, 'shortening': 0.88,
+
+  // Butter / ghee (melted state density)
+  'butter': 0.91, 'unsalted butter': 0.91, 'salted butter': 0.91, 'ghee': 0.91,
+
+  // Nut butters (dense pastes)
+  'peanut butter': 1.08, 'almond butter': 1.08, 'tahini': 1.02, 'sesame paste': 1.02,
+
+  // Flours
+  'flour': 0.53, 'all purpose flour': 0.53, 'all-purpose flour': 0.53,
+  'bread flour': 0.55, 'cake flour': 0.48, 'whole wheat flour': 0.57,
+  'almond flour': 0.37, 'coconut flour': 0.43, 'rice flour': 0.55,
+  'glutinous rice flour': 0.55,
+
+  // Starches and dry powders
+  'cornstarch': 0.52, 'corn starch': 0.52,
+  'tapioca starch': 0.50, 'tapioca flour': 0.50,
+  'potato starch': 0.58,
+  'cocoa powder': 0.35,
+  'baking powder': 0.92,
+  'matcha': 0.35, 'matcha powder': 0.35,
+
+  // Oats and crumbs
+  'oats': 0.37, 'rolled oats': 0.37, 'oatmeal': 0.37,
+  'bread crumbs': 0.48, 'panko': 0.48,
+
+  // Sweeteners — granular
+  'sugar': 0.85, 'white sugar': 0.85, 'granulated sugar': 0.85,
+  'powdered sugar': 0.50, 'confectioners sugar': 0.50,
+  'brown sugar': 0.92,
+  'coconut sugar': 0.80, 'palm sugar': 0.80,
+
+  // Sweeteners — liquid (denser than water)
+  'honey': 1.42, 'maple syrup': 1.32, 'molasses': 1.44,
+  'agave': 1.43, 'corn syrup': 1.38, 'mirin': 1.03,
+
+  // Condiments
+  'soy sauce': 1.07, 'light soy sauce': 1.07, 'dark soy sauce': 1.09,
+  'fish sauce': 1.07, 'oyster sauce': 1.15, 'hoisin sauce': 1.15,
+  'ketchup': 1.07, 'mayonnaise': 1.00, 'mayo': 1.00,
+
+  // Dense dairy
+  'cream cheese': 1.02, 'sour cream': 1.04, 'yogurt': 1.04,
+  'greek yogurt': 1.04, 'cottage cheese': 1.04, 'ricotta': 1.04,
+};
+
+/**
+ * Get the density (g/ml) for a food item used in volume-to-weight conversion.
+ * Tries exact match first, then category keyword fallbacks.
+ */
+export function getVolumeDensity(food: string): number {
+  if (VOLUME_DENSITY_G_PER_ML[food] !== undefined) {
+    return VOLUME_DENSITY_G_PER_ML[food];
+  }
+  // Category fallbacks by keyword
+  if (food.includes('flour')) return 0.53;
+  if (food.includes('starch')) return 0.52;
+  if (food.includes('powder') && !food.includes('baking')) return 0.40;
+  if (food.includes('oil')) return 0.92;
+  if (food.includes('syrup')) return 1.30;
+  if (food.includes('honey')) return 1.42;
+  if (food.includes('butter') && !food.includes('peanut') && !food.includes('almond')) return 0.91;
+  if (food.includes('oat')) return 0.37;
+  return 1.0; // water default
+}
+
+// ── Volume units (for density correction) ──
+const VOLUME_UNITS = new Set([
+  'ml', 'milliliter', 'milliliters', 'l', 'liter', 'liters',
+  'cup', 'cups', 'c',
+  'tbsp', 'tablespoon', 'tablespoons', 'tbs',
+  'tsp', 'teaspoon', 'teaspoons',
+  'fl oz', 'fluid ounce', 'fluid ounces',
+  'pint', 'pints', 'pt',
+  'quart', 'quarts', 'qt',
+  'gallon', 'gallons', 'gal',
+]);
+
 // ── Unit conversions to grams ──
 const UNIT_TO_GRAMS: Record<string, number> = {
   // Metric
@@ -886,7 +973,11 @@ function toGrams(parsed: ParsedIngredient): number {
   const { quantity, unit, food } = parsed;
 
   if (unit && UNIT_TO_GRAMS[unit]) {
-    return quantity * UNIT_TO_GRAMS[unit];
+    const baseGrams = quantity * UNIT_TO_GRAMS[unit];
+    if (VOLUME_UNITS.has(unit)) {
+      return baseGrams * getVolumeDensity(food);
+    }
+    return baseGrams;
   }
 
   // No unit — look up whole item weight

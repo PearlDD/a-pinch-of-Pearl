@@ -261,6 +261,25 @@
   cursor: not-allowed;
 }
 
+.matchRate {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  margin: 0.4rem 0 0;
+}
+
+.matchRateGreen {
+  color: #2e7d32;
+}
+
+.matchRateAmber {
+  color: #e65100;
+}
+
+.matchRateRed {
+  color: #c62828;
+}
+
 @media (max-width: 768px) {
   .formRow { grid-template-columns: 1fr; }
 }
