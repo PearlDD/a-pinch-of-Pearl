@@ -1,0 +1,61 @@
+{
+  "goal": "Improve code quality, test coverage, and add new features to the recipe blog.",
+  "scope": [
+    "nextjs-app/src/**/*.ts",
+    "nextjs-app/src/**/*.tsx",
+    "nextjs-app/src/**/*.css",
+    "nextjs-app/src/**/*.test.ts",
+    "nextjs-app/src/**/*.test.tsx",
+    "nextjs-app/e2e/**/*.ts",
+    "nextjs-app/package.json",
+    "nextjs-app/tsconfig.json",
+    "nextjs-app/jest.config.ts",
+    "nextjs-app/playwright.config.ts",
+    "nextjs-app/next.config.js",
+    "eval/**"
+  ],
+  "guards": [
+    "Do not modify supabase-setup.sql",
+    "Do not delete or overwrite existing tests",
+    "Do not change environment variable names (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_ADMIN_UID)",
+    "Do not introduce secrets or credentials into the repository",
+    "Do not modify files outside the declared scope"
+  ],
+  "eval_command": "python3 eval/score.py",
+  "eval_threshold": 0.3,
+  "constraints": [
+    "Prefer small, incremental changes over large rewrites",
+    "Each change should be accompanied by at least one test",
+    "Follow the existing code style and conventions (CSS Modules, custom hooks pattern)",
+    "Use the existing path alias @ for src/ imports"
+  ],
+  "hypothesis_budget": {
+    "min_growth": 1,
+    "max_new": 2
+  },
+  "target_branch": "main",
+  "smoke_test": "cd nextjs-app && npx tsc --noEmit",
+  "project_eval": [],
+  "eval_weights": {
+    "hygiene": 0.5,
+    "growth": 0.5,
+    "project": 0.0
+  },
+  "research_target": null,
+  "inner_loop": null,
+  "outer_loop": null,
+  "mutable_surfaces": [],
+  "fixed_surfaces": [],
+  "research_constraints": [],
+  "cost_budget": null,
+  "hard_constraints": [],
+  "eval_spec": [],
+  "hygiene_weights": null,
+  "growth_weights": null,
+  "adversarial": null,
+  "parallel": null,
+  "clean_pr": false,
+  "clean_pr_include": [],
+  "clean_pr_exclude": [],
+  "test_timeout": 600
+}

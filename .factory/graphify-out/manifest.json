@@ -1,0 +1,217 @@
+{
+  ".factory/eval_spec.json": {
+    "mtime": 1787335015.7305796,
+    "ast_hash": "b41d4d71ec2323f847d05554caa8011c",
+    "semantic_hash": "b41d4d71ec2323f847d05554caa8011c"
+  },
+  "eval/score.py": {
+    "mtime": 1787335015.73048,
+    "ast_hash": "60efce59ea17e7bbc8d2c9d613313f8a",
+    "semantic_hash": "60efce59ea17e7bbc8d2c9d613313f8a"
+  },
+  "nextjs-app/e2e/home.spec.ts": {
+    "mtime": 1787334979.1755884,
+    "ast_hash": "03f373c7d62f852e5730b54013e57af4",
+    "semantic_hash": "03f373c7d62f852e5730b54013e57af4"
+  },
+  "nextjs-app/jest.config.ts": {
+    "mtime": 1787334979.1758025,
+    "ast_hash": "0fe22d8478d08ba75f6f4961403ada04",
+    "semantic_hash": "0fe22d8478d08ba75f6f4961403ada04"
+  },
+  "nextjs-app/next.config.js": {
+    "mtime": 1787334979.1762383,
+    "ast_hash": "9920cf4f561f92b4599706a129c33a23",
+    "semantic_hash": "9920cf4f561f92b4599706a129c33a23"
+  },
+  "nextjs-app/package.json": {
+    "mtime": 1787334979.177629,
+    "ast_hash": "44f8627eb4376ca87a8912dc5d0dbe84",
+    "semantic_hash": "44f8627eb4376ca87a8912dc5d0dbe84"
+  },
+  "nextjs-app/playwright.config.ts": {
+    "mtime": 1787334979.177856,
+    "ast_hash": "9f2900f1af26aa455b7b16db3a245e6f",
+    "semantic_hash": "9f2900f1af26aa455b7b16db3a245e6f"
+  },
+  "nextjs-app/src/__tests__/mocks/next-navigation.ts": {
+    "mtime": 1787334979.1781297,
+    "ast_hash": "6d88d94f57eca81d82d95ce1806a367f",
+    "semantic_hash": "6d88d94f57eca81d82d95ce1806a367f"
+  },
+  "nextjs-app/src/__tests__/mocks/supabase.ts": {
+    "mtime": 1787334979.1783109,
+    "ast_hash": "4e66c28825d1f04dfc0e76cd5041e7ea",
+    "semantic_hash": "4e66c28825d1f04dfc0e76cd5041e7ea"
+  },
+  "nextjs-app/src/__tests__/setup.ts": {
+    "mtime": 1787334979.178517,
+    "ast_hash": "734e03186454e48c094cc7daaec440c5",
+    "semantic_hash": "734e03186454e48c094cc7daaec440c5"
+  },
+  "nextjs-app/src/app/admin/analytics/page.tsx": {
+    "mtime": 1787334979.1795733,
+    "ast_hash": "78fa55fd0f28fc65d9ed2a17cb49ac34",
+    "semantic_hash": "78fa55fd0f28fc65d9ed2a17cb49ac34"
+  },
+  "nextjs-app/src/app/admin/login/page.tsx": {
+    "mtime": 1787334979.180105,
+    "ast_hash": "5008012d6f4d19f9cd8b752a19b49b13",
+    "semantic_hash": "5008012d6f4d19f9cd8b752a19b49b13"
+  },
+  "nextjs-app/src/app/admin/page.tsx": {
+    "mtime": 1787334979.180362,
+    "ast_hash": "e15414112c8b37fcc83499de355a0b16",
+    "semantic_hash": "e15414112c8b37fcc83499de355a0b16"
+  },
+  "nextjs-app/src/app/admin/recipes/[id]/edit/page.tsx": {
+    "mtime": 1787334979.1807284,
+    "ast_hash": "8890894807facf11d754dd7e1bcd170e",
+    "semantic_hash": "8890894807facf11d754dd7e1bcd170e"
+  },
+  "nextjs-app/src/app/admin/recipes/new/page.tsx": {
+    "mtime": 1787334979.1809626,
+    "ast_hash": "77a33a3ff88a510797f9656f4ee00df2",
+    "semantic_hash": "77a33a3ff88a510797f9656f4ee00df2"
+  },
+  "nextjs-app/src/app/layout.tsx": {
+    "mtime": 1787334979.181212,
+    "ast_hash": "bd04e90d0e048db0176f1199dd4de8a5",
+    "semantic_hash": "bd04e90d0e048db0176f1199dd4de8a5"
+  },
+  "nextjs-app/src/app/page.tsx": {
+    "mtime": 1787334979.1816525,
+    "ast_hash": "aef1c59a3104d470dfbac1ce5edc5fc3",
+    "semantic_hash": "aef1c59a3104d470dfbac1ce5edc5fc3"
+  },
+  "nextjs-app/src/app/recipe/[id]/RecipeDetailClient.tsx": {
+    "mtime": 1787334979.1820374,
+    "ast_hash": "588ca6631e103ce4088f12969ebee77c",
+    "semantic_hash": "588ca6631e103ce4088f12969ebee77c"
+  },
+  "nextjs-app/src/app/recipe/[id]/page.tsx": {
+    "mtime": 1787334979.182355,
+    "ast_hash": "36a79071529e5c6b996df4ee21eb2a98",
+    "semantic_hash": "36a79071529e5c6b996df4ee21eb2a98"
+  },
+  "nextjs-app/src/app/recipe/__tests__/RecipeDetailClient.test.tsx": {
+    "mtime": 1787334979.1827116,
+    "ast_hash": "81c6995b173e95801e26bd399f74d5b1",
+    "semantic_hash": "81c6995b173e95801e26bd399f74d5b1"
+  },
+  "nextjs-app/src/components/CommentSection.tsx": {
+    "mtime": 1787334979.1842022,
+    "ast_hash": "f90971cd92330e47bf9c0a8edff239c8",
+    "semantic_hash": "f90971cd92330e47bf9c0a8edff239c8"
+  },
+  "nextjs-app/src/components/Footer.tsx": {
+    "mtime": 1787334979.1869814,
+    "ast_hash": "4bdaddeb3eabe30eb5eb5195d03649e1",
+    "semantic_hash": "4bdaddeb3eabe30eb5eb5195d03649e1"
+  },
+  "nextjs-app/src/components/Header.tsx": {
+    "mtime": 1787334979.1890647,
+    "ast_hash": "8a7a993440e24b5335b0dc59781039c1",
+    "semantic_hash": "8a7a993440e24b5335b0dc59781039c1"
+  },
+  "nextjs-app/src/components/Hero.tsx": {
+    "mtime": 1787334979.1894336,
+    "ast_hash": "875e753fd2f99c61fe83a7aabb38425d",
+    "semantic_hash": "875e753fd2f99c61fe83a7aabb38425d"
+  },
+  "nextjs-app/src/components/LikeButton.tsx": {
+    "mtime": 1787334979.189747,
+    "ast_hash": "9844069246b84c579a4740eb60681b46",
+    "semantic_hash": "9844069246b84c579a4740eb60681b46"
+  },
+  "nextjs-app/src/components/ListInput.tsx": {
+    "mtime": 1787334979.1909997,
+    "ast_hash": "0b4b91980b0f09ffd7b78fbee0bb1162",
+    "semantic_hash": "0b4b91980b0f09ffd7b78fbee0bb1162"
+  },
+  "nextjs-app/src/components/RecipeCard.tsx": {
+    "mtime": 1787334979.1915963,
+    "ast_hash": "5bfd248999ee997cbdc107e8b1f125a9",
+    "semantic_hash": "5bfd248999ee997cbdc107e8b1f125a9"
+  },
+  "nextjs-app/src/components/RecipeModal.tsx": {
+    "mtime": 1787334979.1920042,
+    "ast_hash": "612530288cbe9612d24be094fb8bd8ab",
+    "semantic_hash": "612530288cbe9612d24be094fb8bd8ab"
+  },
+  "nextjs-app/src/components/__tests__/Footer.test.tsx": {
+    "mtime": 1787334979.1922178,
+    "ast_hash": "d1458216fc9ce7bff2333e6c52dd5f75",
+    "semantic_hash": "d1458216fc9ce7bff2333e6c52dd5f75"
+  },
+  "nextjs-app/src/components/__tests__/RecipeCard.test.tsx": {
+    "mtime": 1787334979.192355,
+    "ast_hash": "0ff1595144e36b922992bd7e6706ddd8",
+    "semantic_hash": "0ff1595144e36b922992bd7e6706ddd8"
+  },
+  "nextjs-app/src/hooks/useAuth.ts": {
+    "mtime": 1787334979.192525,
+    "ast_hash": "6f4d4c9a1047d335b300207c780aad72",
+    "semantic_hash": "6f4d4c9a1047d335b300207c780aad72"
+  },
+  "nextjs-app/src/hooks/useComments.ts": {
+    "mtime": 1787334979.1927667,
+    "ast_hash": "6fd809d4b32a5597699308e5f13f43d0",
+    "semantic_hash": "6fd809d4b32a5597699308e5f13f43d0"
+  },
+  "nextjs-app/src/hooks/useFavorites.ts": {
+    "mtime": 1787334979.1929915,
+    "ast_hash": "b451469c87cd447adcf65ac0637f91f8",
+    "semantic_hash": "b451469c87cd447adcf65ac0637f91f8"
+  },
+  "nextjs-app/src/hooks/useLikes.ts": {
+    "mtime": 1787334979.1932132,
+    "ast_hash": "3a22910a27633bd6bf03dae942d1f414",
+    "semantic_hash": "3a22910a27633bd6bf03dae942d1f414"
+  },
+  "nextjs-app/src/hooks/useRecipes.ts": {
+    "mtime": 1787334979.1933334,
+    "ast_hash": "8a869cf12d9663b2fe145e87e7ca2f15",
+    "semantic_hash": "8a869cf12d9663b2fe145e87e7ca2f15"
+  },
+  "nextjs-app/src/lib/fingerprint.ts": {
+    "mtime": 1787334979.193498,
+    "ast_hash": "cd431d5837e6fa90c805ac8b00c7969f",
+    "semantic_hash": "cd431d5837e6fa90c805ac8b00c7969f"
+  },
+  "nextjs-app/src/lib/nutritionCalculator.ts": {
+    "mtime": 1787334979.1938026,
+    "ast_hash": "354f8a793686baaeb68d5d07e6c29e29",
+    "semantic_hash": "354f8a793686baaeb68d5d07e6c29e29"
+  },
+  "nextjs-app/src/lib/supabase.ts": {
+    "mtime": 1787334979.194155,
+    "ast_hash": "af2e09a7fc68e5322888f60c3f28903c",
+    "semantic_hash": "af2e09a7fc68e5322888f60c3f28903c"
+  },
+  "nextjs-app/src/lib/types.ts": {
+    "mtime": 1787334979.1942828,
+    "ast_hash": "afd11ae41c3b45cb9abd529ed67f83c3",
+    "semantic_hash": "afd11ae41c3b45cb9abd529ed67f83c3"
+  },
+  "nextjs-app/src/lib/uploadPhoto.ts": {
+    "mtime": 1787334979.1946495,
+    "ast_hash": "0d1974701d19dc62bc35d979289e48cf",
+    "semantic_hash": "0d1974701d19dc62bc35d979289e48cf"
+  },
+  "nextjs-app/src/lib/videoEmbed.ts": {
+    "mtime": 1787334979.1947675,
+    "ast_hash": "d3bb51c78189d720e395fe426a3db807",
+    "semantic_hash": "d3bb51c78189d720e395fe426a3db807"
+  },
+  "nextjs-app/tsconfig.json": {
+    "mtime": 1787334979.1951501,
+    "ast_hash": "14014f38890b22f16da0a76fe3b0f711",
+    "semantic_hash": "14014f38890b22f16da0a76fe3b0f711"
+  },
+  "supabase-setup.sql": {
+    "mtime": 1787334979.1952908,
+    "ast_hash": "ab1862b523146ea388cd20d1010d244e",
+    "semantic_hash": "ab1862b523146ea388cd20d1010d244e"
+  }
+}

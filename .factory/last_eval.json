@@ -1,0 +1,98 @@
+{
+  "total": 0.30747549019607845,
+  "results": [
+    {
+      "name": "tests",
+      "score": 0.0,
+      "weight": 0.12916666666666668,
+      "passed": false,
+      "details": "nextjs-app(js): 0 passed, 3 failed"
+    },
+    {
+      "name": "lint",
+      "score": 0.9,
+      "weight": 0.0625,
+      "passed": false,
+      "details": "nextjs-app(js): 1 errors"
+    },
+    {
+      "name": "type_check",
+      "score": 0.8,
+      "weight": 0.04166666666666667,
+      "passed": false,
+      "details": "nextjs-app(ts): 4 errors"
+    },
+    {
+      "name": "coverage",
+      "score": 0.5,
+      "weight": 0.10416666666666667,
+      "passed": true,
+      "details": "Not detected: no coverage tool detected"
+    },
+    {
+      "name": "config_parser",
+      "score": 1.0,
+      "weight": 0.04166666666666667,
+      "passed": true,
+      "details": "OK: goal is non-empty; OK: scope has entries; OK: eval_command is non-empty; OK: eval_threshold is positive"
+    },
+    {
+      "name": "architecture",
+      "score": 0.5,
+      "weight": 0.0375,
+      "passed": true,
+      "details": "Not detected: no .sentrux/rules.toml found"
+    },
+    {
+      "name": "build",
+      "score": 0.0,
+      "weight": 0.08333333333333334,
+      "passed": false,
+      "details": "db25/nextjs-app/.next/server/webpack-runtime.js:1:1181)\n    at /Users/pearl/GitHub/a-pinch-of-Pearl/.factory-worktrees/run-9376db25/nextjs-app/.next/server/app/recipe/[id]/page.js:37:54150\n\n> Build error occurred\nError: Failed to collect page data for /recipe/[id]\n    at /Users/pearl/GitHub/a-pinch-of-Pearl/.factory-worktrees/run-9376db25/nextjs-app/node_modules/next/dist/build/utils.js:1269:15\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {\n  type: 'Error'\n}"
+    },
+    {
+      "name": "capability_surface",
+      "score": 0.0,
+      "weight": 0.12254901960784313,
+      "passed": false,
+      "details": "surface=0 (modules=0, public_fns=0, entry_points=0), target=100"
+    },
+    {
+      "name": "experiment_diversity",
+      "score": 0.5,
+      "weight": 0.09803921568627451,
+      "passed": true,
+      "details": "Only 0 experiments, too few to judge"
+    },
+    {
+      "name": "observability",
+      "score": 0.0,
+      "weight": 0.08823529411764705,
+      "passed": false,
+      "details": "observability_score=0.00, function_coverage=0.00, structured_logging=False"
+    },
+    {
+      "name": "research_grounding",
+      "score": 0.0,
+      "weight": 0.0784313725490196,
+      "passed": true,
+      "details": "vault not configured \u2014 set $FACTORY_VAULT_PATH"
+    },
+    {
+      "name": "factory_effectiveness",
+      "score": 0.5,
+      "weight": 0.06372549019607843,
+      "passed": true,
+      "details": "Only 0 experiments, too few to judge"
+    },
+    {
+      "name": "spec_compliance",
+      "score": 0.5,
+      "weight": 0.049019607843137254,
+      "passed": true,
+      "details": "spec_results.json not found \u2014 neutral score"
+    }
+  ],
+  "guard_violations": [],
+  "passed": true
+}

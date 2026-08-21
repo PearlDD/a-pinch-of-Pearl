@@ -1,0 +1,362 @@
+{
+  "communities": {
+    "0": [
+      "eslint",
+      "eslint_config_next",
+      "jest",
+      "jest_environment_jsdom",
+      "netlify_plugin_nextjs",
+      "nextjs_app_package_devdependencies",
+      "nextjs_app_package_devdependencies_eslint",
+      "nextjs_app_package_devdependencies_eslint_config_next",
+      "nextjs_app_package_devdependencies_jest",
+      "nextjs_app_package_devdependencies_jest_environment_jsdom",
+      "nextjs_app_package_devdependencies_netlify_plugin_nextjs",
+      "nextjs_app_package_devdependencies_playwright_test",
+      "nextjs_app_package_devdependencies_testing_library_jest_dom",
+      "nextjs_app_package_devdependencies_testing_library_react",
+      "nextjs_app_package_devdependencies_testing_library_user_event",
+      "nextjs_app_package_devdependencies_types_jest",
+      "nextjs_app_package_devdependencies_types_node",
+      "nextjs_app_package_devdependencies_types_react",
+      "nextjs_app_package_devdependencies_types_react_dom",
+      "nextjs_app_package_devdependencies_typescript",
+      "playwright_test",
+      "testing_library_jest_dom",
+      "testing_library_react",
+      "testing_library_user_event",
+      "types_jest",
+      "types_node",
+      "types_react",
+      "types_react_dom",
+      "typescript"
+    ],
+    "1": [
+      "nextjs_app_src_app_page",
+      "nextjs_app_src_app_page_home",
+      "nextjs_app_src_app_page_homecontent",
+      "nextjs_app_src_app_recipe_id_recipedetailclient",
+      "nextjs_app_src_app_recipe_id_recipedetailclient_recipedetailclientprops",
+      "nextjs_app_src_app_recipe_tests_recipedetailclient_test",
+      "nextjs_app_src_app_recipe_tests_recipedetailclient_test_baserecipe",
+      "nextjs_app_src_components_footer",
+      "nextjs_app_src_components_footer_footer",
+      "nextjs_app_src_components_header",
+      "nextjs_app_src_components_header_header",
+      "nextjs_app_src_components_header_headerprops",
+      "nextjs_app_src_components_hero",
+      "nextjs_app_src_components_hero_hero",
+      "nextjs_app_src_components_recipecard",
+      "nextjs_app_src_components_recipecard_recipecardprops",
+      "nextjs_app_src_components_recipemodal",
+      "nextjs_app_src_components_recipemodal_recipemodalprops",
+      "nextjs_app_src_components_tests_footer_test",
+      "nextjs_app_src_components_tests_recipecard_test",
+      "nextjs_app_src_components_tests_recipecard_test_mockrecipe",
+      "nextjs_app_src_hooks_userecipes",
+      "nextjs_app_src_hooks_userecipes_userecipes",
+      "nextjs_app_src_lib_types",
+      "nextjs_app_src_lib_types_categories",
+      "nextjs_app_src_lib_types_category",
+      "nextjs_app_src_lib_types_parsecategories",
+      "nextjs_app_src_lib_types_recipe",
+      "nextjs_app_src_lib_types_recipelike"
+    ],
+    "2": [
+      "nextjs_app_tsconfig",
+      "nextjs_app_tsconfig_compileroptions",
+      "nextjs_app_tsconfig_compileroptions_allowjs",
+      "nextjs_app_tsconfig_compileroptions_esmoduleinterop",
+      "nextjs_app_tsconfig_compileroptions_incremental",
+      "nextjs_app_tsconfig_compileroptions_isolatedmodules",
+      "nextjs_app_tsconfig_compileroptions_jsx",
+      "nextjs_app_tsconfig_compileroptions_lib",
+      "nextjs_app_tsconfig_compileroptions_module",
+      "nextjs_app_tsconfig_compileroptions_moduleresolution",
+      "nextjs_app_tsconfig_compileroptions_noemit",
+      "nextjs_app_tsconfig_compileroptions_paths",
+      "nextjs_app_tsconfig_compileroptions_plugins",
+      "nextjs_app_tsconfig_compileroptions_resolvejsonmodule",
+      "nextjs_app_tsconfig_compileroptions_skiplibcheck",
+      "nextjs_app_tsconfig_compileroptions_strict",
+      "nextjs_app_tsconfig_compileroptions_target",
+      "nextjs_app_tsconfig_exclude",
+      "nextjs_app_tsconfig_include",
+      "ref_dom",
+      "ref_dom_iterable",
+      "ref_esnext",
+      "ref_next_env_d_ts",
+      "ref_next_types_ts",
+      "ref_node_modules",
+      "ref_ts",
+      "ref_tsx"
+    ],
+    "3": [
+      "nextjs_app_src_app_admin_analytics_page",
+      "nextjs_app_src_app_admin_analytics_page_getperiodstart",
+      "nextjs_app_src_app_admin_analytics_page_period",
+      "nextjs_app_src_app_admin_analytics_page_period_labels",
+      "nextjs_app_src_app_admin_login_page",
+      "nextjs_app_src_app_admin_login_page_clearlockoutdata",
+      "nextjs_app_src_app_admin_login_page_getlockoutdata",
+      "nextjs_app_src_app_admin_login_page_lockoutdata",
+      "nextjs_app_src_app_admin_login_page_savelockoutdata",
+      "nextjs_app_src_app_admin_page",
+      "nextjs_app_src_app_admin_page_admindashboard",
+      "nextjs_app_src_app_admin_recipes_id_edit_page",
+      "nextjs_app_src_app_admin_recipes_id_edit_page_editrecipepage",
+      "nextjs_app_src_app_admin_recipes_new_page",
+      "nextjs_app_src_app_admin_recipes_new_page_addrecipepage",
+      "nextjs_app_src_components_listinput",
+      "nextjs_app_src_components_listinput_listinput",
+      "nextjs_app_src_components_listinput_listinputprops",
+      "nextjs_app_src_hooks_useauth",
+      "nextjs_app_src_hooks_useauth_useauth",
+      "nextjs_app_src_lib_supabase",
+      "nextjs_app_src_lib_supabase_supabase",
+      "nextjs_app_src_lib_types_formatcategories",
+      "nextjs_app_src_lib_uploadphoto",
+      "nextjs_app_src_lib_uploadphoto_uploadphoto"
+    ],
+    "4": [
+      "next",
+      "nextjs_app_package",
+      "nextjs_app_package_dependencies",
+      "nextjs_app_package_dependencies_next",
+      "nextjs_app_package_dependencies_react",
+      "nextjs_app_package_dependencies_react_dom",
+      "nextjs_app_package_dependencies_supabase_supabase_js",
+      "nextjs_app_package_name",
+      "nextjs_app_package_private",
+      "nextjs_app_package_scripts",
+      "nextjs_app_package_scripts_build",
+      "nextjs_app_package_scripts_dev",
+      "nextjs_app_package_scripts_lint",
+      "nextjs_app_package_scripts_start",
+      "nextjs_app_package_scripts_test",
+      "nextjs_app_package_scripts_test_coverage",
+      "nextjs_app_package_scripts_test_e2e",
+      "nextjs_app_package_scripts_test_e2e_headed",
+      "nextjs_app_package_scripts_test_e2e_ui",
+      "nextjs_app_package_scripts_test_watch",
+      "nextjs_app_package_version",
+      "react",
+      "react_dom",
+      "supabase_supabase_js"
+    ],
+    "5": [
+      "nextjs_app_src_lib_nutritioncalculator",
+      "nextjs_app_src_lib_nutritioncalculator_calculatenutrition",
+      "nextjs_app_src_lib_nutritioncalculator_findbestmatch",
+      "nextjs_app_src_lib_nutritioncalculator_fraction_map",
+      "nextjs_app_src_lib_nutritioncalculator_nutrition_db",
+      "nextjs_app_src_lib_nutritioncalculator_nutritionper100g",
+      "nextjs_app_src_lib_nutritioncalculator_nutritionresult",
+      "nextjs_app_src_lib_nutritioncalculator_parsedingredient",
+      "nextjs_app_src_lib_nutritioncalculator_parseingredientline",
+      "nextjs_app_src_lib_nutritioncalculator_parsequantity",
+      "nextjs_app_src_lib_nutritioncalculator_tograms",
+      "nextjs_app_src_lib_nutritioncalculator_unit_to_grams",
+      "nextjs_app_src_lib_nutritioncalculator_whole_item_grams"
+    ],
+    "6": [
+      "nextjs_app_src_components_likebutton",
+      "nextjs_app_src_components_likebutton_likebutton",
+      "nextjs_app_src_components_likebutton_likebuttonprops",
+      "nextjs_app_src_hooks_usefavorites",
+      "nextjs_app_src_hooks_usefavorites_usefavorites",
+      "nextjs_app_src_hooks_uselikes",
+      "nextjs_app_src_hooks_uselikes_uselikes",
+      "nextjs_app_src_lib_fingerprint",
+      "nextjs_app_src_lib_fingerprint_getbrowserfingerprint"
+    ],
+    "7": [
+      "eval_score",
+      "eval_score_eval_observability",
+      "eval_score_eval_syntax_check",
+      "eval_score_main",
+      "eval_score_rationale_19",
+      "eval_score_rationale_54"
+    ],
+    "8": [
+      "nextjs_app_src_components_commentsection",
+      "nextjs_app_src_components_commentsection_commentsection",
+      "nextjs_app_src_components_commentsection_commentsectionprops",
+      "nextjs_app_src_hooks_usecomments",
+      "nextjs_app_src_hooks_usecomments_usecomments",
+      "nextjs_app_src_lib_types_recipecomment"
+    ],
+    "9": [
+      "nextjs_app_src_app_recipe_id_page",
+      "nextjs_app_src_app_recipe_id_page_generatemetadata",
+      "nextjs_app_src_app_recipe_id_page_recipedetailpage",
+      "nextjs_app_src_app_recipe_id_page_supabase"
+    ],
+    "10": [
+      "nextjs_app_src_tests_mocks_next_navigation",
+      "nextjs_app_src_tests_mocks_supabase",
+      "nextjs_app_src_tests_mocks_supabase_mocksupabase",
+      "nextjs_app_src_tests_setup"
+    ],
+    "11": [
+      "nextjs_app_jest_config",
+      "nextjs_app_jest_config_config",
+      "nextjs_app_jest_config_createjestconfig"
+    ],
+    "12": [
+      "nextjs_app_src_app_layout",
+      "nextjs_app_src_app_layout_metadata",
+      "nextjs_app_src_app_layout_rootlayout"
+    ],
+    "13": [
+      "nextjs_app_next_config",
+      "nextjs_app_next_config_nextconfig"
+    ],
+    "14": [
+      "nextjs_app_src_lib_videoembed",
+      "nextjs_app_src_lib_videoembed_getembedurl"
+    ],
+    "15": [
+      "nextjs_app_e2e_home_spec"
+    ],
+    "16": [
+      "nextjs_app_playwright_config"
+    ],
+    "17": [
+      "nextjs_app_src_app_admin_login_page_adminlogin"
+    ]
+  },
+  "cohesion": {
+    "0": 0.06896551724137931,
+    "1": 0.14039408866995073,
+    "2": 0.07407407407407407,
+    "3": 0.16666666666666666,
+    "4": 0.08333333333333333,
+    "5": 0.20512820512820512,
+    "6": 0.3888888888888889,
+    "7": 0.3333333333333333,
+    "8": 0.4666666666666667,
+    "9": 0.5,
+    "10": 0.5,
+    "11": 0.6666666666666666,
+    "12": 0.6666666666666666,
+    "13": 1.0,
+    "14": 1.0,
+    "15": 1.0,
+    "16": 1.0,
+    "17": 1.0
+  },
+  "gods": [
+    {
+      "id": "nextjs_app_tsconfig_compileroptions",
+      "label": "compilerOptions",
+      "degree": 16
+    },
+    {
+      "id": "nextjs_app_src_lib_types_recipe",
+      "label": "Recipe",
+      "degree": 13
+    },
+    {
+      "id": "nextjs_app_src_hooks_useauth_useauth",
+      "label": "useAuth()",
+      "degree": 12
+    },
+    {
+      "id": "nextjs_app_src_lib_supabase_supabase",
+      "label": "supabase",
+      "degree": 12
+    },
+    {
+      "id": "nextjs_app_package_scripts",
+      "label": "scripts",
+      "degree": 11
+    },
+    {
+      "id": "nextjs_app_src_lib_nutritioncalculator_calculatenutrition",
+      "label": "calculateNutrition()",
+      "degree": 8
+    },
+    {
+      "id": "nextjs_app_src_lib_types_parsecategories",
+      "label": "parseCategories()",
+      "degree": 7
+    },
+    {
+      "id": "nextjs_app_src_app_admin_recipes_id_edit_page_editrecipepage",
+      "label": "EditRecipePage()",
+      "degree": 6
+    },
+    {
+      "id": "nextjs_app_src_lib_types_categories",
+      "label": "CATEGORIES",
+      "degree": 6
+    },
+    {
+      "id": "nextjs_app_src_app_admin_recipes_new_page_addrecipepage",
+      "label": "AddRecipePage()",
+      "degree": 5
+    }
+  ],
+  "surprises": [
+    {
+      "source": "AdminDashboard()",
+      "target": "useAuth()",
+      "source_files": [
+        "nextjs-app/src/app/admin/page.tsx",
+        "nextjs-app/src/hooks/useAuth.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "peripheral node `AdminDashboard()` unexpectedly reaches hub `useAuth()`"
+    },
+    {
+      "source": "EditRecipePage()",
+      "target": "calculateNutrition()",
+      "source_files": [
+        "nextjs-app/src/app/admin/recipes/[id]/edit/page.tsx",
+        "nextjs-app/src/lib/nutritionCalculator.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "EditRecipePage()",
+      "target": "parseCategories()",
+      "source_files": [
+        "nextjs-app/src/app/admin/recipes/[id]/edit/page.tsx",
+        "nextjs-app/src/lib/types.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "AddRecipePage()",
+      "target": "calculateNutrition()",
+      "source_files": [
+        "nextjs-app/src/app/admin/recipes/new/page.tsx",
+        "nextjs-app/src/lib/nutritionCalculator.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "HomeContent()",
+      "target": "useAuth()",
+      "source_files": [
+        "nextjs-app/src/app/page.tsx",
+        "nextjs-app/src/hooks/useAuth.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    }
+  ],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}
