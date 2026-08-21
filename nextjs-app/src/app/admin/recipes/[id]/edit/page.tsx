@@ -37,6 +37,7 @@ export default function EditRecipePage() {
   const [photoUrl, setPhotoUrl] = useState('');
   const [photos, setPhotos] = useState('');
   const [sourceUrl, setSourceUrl] = useState('');
+  const [matchRate, setMatchRate] = useState('');
   const [uploading, setUploading] = useState(false);
   const [additionalUploading, setAdditionalUploading] = useState(false);
 
@@ -154,6 +155,7 @@ export default function EditRecipePage() {
     setProtein(result.protein);
     setFat(result.fat);
     setFiber(result.fiber);
+    setMatchRate(`${result.matched}/${result.total}`);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -319,6 +321,12 @@ export default function EditRecipePage() {
             >
               Auto-calculate Nutrition
             </button>
+            {matchRate && (() => {
+              const [matched, total] = matchRate.split('/').map(Number);
+              const pct = total > 0 ? (matched / total) * 100 : 0;
+              const colorClass = pct >= 80 ? styles.matchRateGreen : pct >= 60 ? styles.matchRateAmber : styles.matchRateRed;
+              return <p className={`${styles.matchRate} ${colorClass}`}>{matchRate} ingredients matched ({Math.round(pct)}%)</p>;
+            })()}
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
                 <label>Calories</label>
