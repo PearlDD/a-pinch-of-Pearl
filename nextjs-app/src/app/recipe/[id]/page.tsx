@@ -4,17 +4,17 @@ import RecipeDetailClient from './RecipeDetailClient';
 
 export const dynamic = 'force-dynamic';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
 // Generate Open Graph metadata for social sharing
 export async function generateMetadata({
   params,
 }: {
   params: { id: string };
 }): Promise<Metadata> {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
   const { data: recipe } = await supabase
     .from('recipes')
     .select('name, description, photo_url, category')
@@ -53,6 +53,11 @@ export default async function RecipeDetailPage({
 }: {
   params: { id: string };
 }) {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
   const { data: recipe } = await supabase
     .from('recipes')
     .select('*')
