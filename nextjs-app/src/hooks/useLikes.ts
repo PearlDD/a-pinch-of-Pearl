@@ -41,20 +41,28 @@ export function useLikes(recipeId: string) {
 
     if (isLiked) {
       // Unlike
-      await supabase
+      const { error } = await supabase
         .from('recipe_likes')
         .delete()
         .eq('recipe_id', recipeId)
         .eq('browser_fingerprint', fingerprint);
 
+      if (error) {
+        console.error('[useLikes] Failed to unlike:', { recipeId, error: error.message });
+      }
+
       setIsLiked(false);
       setLikeCount((prev) => Math.max(0, prev - 1));
     } else {
       // Like
-      await supabase.from('recipe_likes').insert({
+      const { error } = await supabase.from('recipe_likes').insert({
         recipe_id: recipeId,
         browser_fingerprint: fingerprint,
       });
+
+      if (error) {
+        console.error('[useLikes] Failed to like:', { recipeId, error: error.message });
+      }
 
       setIsLiked(true);
       setLikeCount((prev) => prev + 1);
