@@ -1,0 +1,10 @@
+.calculate { margin-bottom: .5rem; padding: .6rem .9rem; border: 1px solid var(--accent-terracotta); border-radius: 6px; background: var(--soft-white); color: var(--accent-terracotta); cursor: pointer; font: inherit; }
+.calculate:hover { background: var(--soft-peach); }
+.calculator { margin-bottom: 1rem; }
+.status { color: #316444; }
+.warning { color: #80520a; line-height: 1.5; }
+.error { color: #a63028; line-height: 1.5; }
+.hint { font-size: .85rem; color: var(--text-medium); line-height: 1.5; }
+.calculator summary { cursor: pointer; margin: .5rem 0; }
+.review { padding-left: 1.3rem; overflow-wrap: anywhere; }
+.review li { margin-bottom: .8rem; line-height: 1.5; }

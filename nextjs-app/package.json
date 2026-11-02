@@ -12,7 +12,8 @@
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:headed": "playwright test --headed"
+    "test:e2e:headed": "playwright test --headed",
+    "test:nutrition-browser": "playwright test --config playwright.nutrition.config.ts"
   },
   "dependencies": {
     "@sparticuz/chromium": "147.0.2",

@@ -86,6 +86,16 @@ Keep AI keys server-only: never add a `NEXT_PUBLIC_` prefix or commit `.env.loca
 
 For local dynamic-page/video imports, install Chromium with `npx playwright install chromium`, or set `RECIPE_BROWSER_EXECUTABLE_PATH` to an existing Chromium executable. Linux deployments use the bundled `@sparticuz/chromium` binary; the Next.js configuration includes its assets in the import function's build trace. Browser and media requests validate public IP destinations and enforce transfer/time limits. Video processing runs through separately authenticated requests to fit Netlify's function time and payload limits.
 
+## Auto-calculate nutrition
+
+Both recipe editors calculate from the complete current ingredient list, including the row being edited and text waiting in **+ Add**. Every click reparses quantities and food names from scratch. Editing ingredients or servings marks a previous calculation as stale; an unsuccessful calculation clears all five previous nutrition values and explains what needs fixing. Saving also commits the visible ingredient draft.
+
+The feedback separates **foods identified** from **amounts resolved** and lists reference weights and assumptions. A 100% food identification rate does not establish quantity accuracy. Unknown foods, missing amounts, unsupported units and ambiguous ranges prevent a full-recipe total from being written. For example, `¼ can tuna` needs a package weight (`¼ can (113 g drained) tuna`), and `1 portion spaghetti` needs its weight and preparation state (`1 portion (80 g dry) spaghetti`). Dry and cooked pasta use different references; canned, ground and sun-dried descriptors are preserved during matching.
+
+Common item counts and supported volume conversions are estimates, explicitly labelled with the grams used. Canned anchovy fillets use a 4 g/count reference, not a universal 100 g/item fallback. For greater accuracy, enter measured edible/drained weights. Blank servings display whole-recipe totals with a notice; positive fractional servings are supported. Nutrition remains optional and editable, and reference values are approximate rather than product-specific label data. This calculator runs locally in the browser and makes no AI/API calls.
+
+References for the added preparation-specific pasta and anchovy data: USDA SR [cereal grains and pasta](https://www.ars.usda.gov/ARSUserFiles/80400535/Data/SR/SR28/reports/sr28fg20.pdf) (20120/20121) and [fish and shellfish](https://www.ars.usda.gov/SP2UserFiles/Place/12354500/Data/SR27/reports/sr27fg15.pdf) (15001/15002).
+
 ## Available commands
 
 Run these from `nextjs-app/`:
@@ -100,8 +110,10 @@ Run these from `nextjs-app/`:
 | `npm run test:coverage` | Run Jest with coverage reporting |
 | `npm run test:e2e` | Run Playwright end-to-end tests |
 | `npm run test:e2e:ui` | Open Playwright's interactive test runner |
+| `npm run test:nutrition-browser` | Run isolated desktop/touch nutrition editor regressions with mocked Supabase |
 
 End-to-end tests require the same Supabase environment variables as the application.
+The isolated nutrition browser suite uses fake auth and recipe data, needs no API keys, and starts its own server on port 3005. Install Chromium first with `npx playwright install chromium` and stop any development server using that port before running it.
 
 ## Project structure
 
