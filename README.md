@@ -122,7 +122,7 @@ End-to-end tests require the same Supabase environment variables as the applicat
 
 The app is configured for Netlify. Connect the repository to a Netlify site, use `nextjs-app` as the base directory, and add the three Supabase environment variables in the site's environment settings. For AI imports, also add `RECIPE_AI_PROVIDER=gemini` and the server-only `GEMINI_API_KEY`, with Functions scope and the deployment contexts you want to test. Redeploy after changing environment variables. Local `.env.local` files are not uploaded.
 
-Netlify runs `npm run build` using Node 22 and automatically applies its current Next.js adapter. The old pinned v4 plugin is removed so App Router API routes use the supported adapter. If the site has a separately configured `AWS_LAMBDA_JS_RUNTIME`, ensure it uses Node 22 or later. Review the PR deploy preview before merging; verify browser startup and an authenticated import in the deployed Linux environment.
+Netlify runs `npm run build` using Node 22 and explicitly applies the pinned current v5 Next.js adapter. This replaces the old v4 adapter and ensures App Router API routes are deployed even when automatic framework detection is disabled in the site's settings. If the site has a separately configured `AWS_LAMBDA_JS_RUNTIME`, ensure it uses Node 22 or later. Review the PR deploy preview before merging; verify browser startup and an authenticated import in the deployed Linux environment.
 
 ## License
 
