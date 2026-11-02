@@ -9,6 +9,8 @@ import { uploadPhoto } from '@/lib/uploadPhoto';
 import { calculateNutrition } from '@/lib/nutritionCalculator';
 import { CATEGORIES, formatCategories } from '@/lib/types';
 import ListInput from '@/components/ListInput';
+import RecipeImport from '@/components/RecipeImport';
+import type { ImportedRecipe } from '@/lib/recipeImport';
 import styles from './recipeForm.module.css';
 
 export default function AddRecipePage() {
@@ -37,6 +39,29 @@ export default function AddRecipePage() {
   const [matchRate, setMatchRate] = useState('');
   const [uploading, setUploading] = useState(false);
   const [additionalUploading, setAdditionalUploading] = useState(false);
+
+  const handleImportedRecipe = (recipe: ImportedRecipe, replace: boolean) => {
+    const fill = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
+      if (value) setter(current => replace || !current.trim() ? value : current);
+    };
+    fill(setName, recipe.name);
+    fill(setDescription, recipe.description);
+    fill(setPrepTime, recipe.prep_time);
+    fill(setCookTime, recipe.cook_time);
+    fill(setServings, recipe.servings);
+    fill(setCalories, recipe.calories);
+    fill(setCarbs, recipe.carbs);
+    fill(setProtein, recipe.protein);
+    fill(setFat, recipe.fat);
+    fill(setFiber, recipe.fiber);
+    fill(setSourceUrl, recipe.source_url);
+    if (recipe.ingredients.length) {
+      setIngredientsList(current => replace || !current.some(item => item.trim()) ? recipe.ingredients : current);
+      setMatchRate('');
+    }
+    if (recipe.instructions.length) setInstructionsList(current => replace || !current.some(item => item.trim()) ? recipe.instructions : current);
+    if (recipe.tips.length) setTipsList(current => replace || !current.some(item => item.trim()) ? recipe.tips : current);
+  };
 
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -183,6 +208,8 @@ export default function AddRecipePage() {
         </Link>
 
         <h1>Add New Recipe</h1>
+
+        <RecipeImport onApply={handleImportedRecipe} />
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formGroup}>

@@ -10,6 +10,7 @@ A warm, personal recipe blog built with Next.js and Supabase. Visitors can brows
 - Like recipes using a privacy-friendly browser fingerprint
 - Read and leave recipe comments
 - Manage recipes from an admin dashboard, including image uploads and clipboard-paste images
+- Import recipe links, copied text, AI answers, or short videos into a reviewable recipe form
 - Generate recipe-page metadata for sharing
 
 ## Built with
@@ -24,7 +25,7 @@ A warm, personal recipe blog built with Next.js and Supabase. Visitors can brows
 
 ### Prerequisites
 
-- Node.js 18.17 or later
+- Node.js 22 (also selected for Netlify builds)
 - A Supabase project
 
 ### Install and run
@@ -66,6 +67,25 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 Visit `/admin/login` and sign in with the Supabase user whose ID matches `NEXT_PUBLIC_ADMIN_UID`. The admin area lets you add, edit, and remove recipes, and includes simple activity statistics on recipe cards.
 
+## Recipe import
+
+The **Add New Recipe** page includes an import panel. Paste a recipe link or recipe text, preview the result, and explicitly apply it to the form. Existing fields are preserved unless you choose to replace them. Importing does not save or publish a recipe, and missing times, quantities, servings, and nutrition are not inferred. Photos are not copied automatically.
+
+Standard Recipe JSON-LD pages and clearly labelled ingredient/instruction text can be parsed without AI. Dynamic share pages are loaded in a server-side browser. Video import supports accessible MP4/WebM clips up to 80 MB and five minutes, using subtitles or speech plus sampled frames; review the result for omitted ingredients and steps. Login-protected, unavailable, or unsupported sources may still need pasted text or a transcript. ChatGPT shares must contain a readable assistant answer.
+
+Copy the settings from [`nextjs-app/.env.example`](./nextjs-app/.env.example) into `.env.local` for development, and configure the same **server-side** variables in Netlify for deployed imports:
+
+```dotenv
+RECIPE_AI_PROVIDER=gemini
+GEMINI_API_KEY=your-google-ai-studio-api-key
+```
+
+Gemini handles both transcription and recipe extraction. Optional `GEMINI_RECIPE_MODEL` and `GEMINI_TRANSCRIPTION_MODEL` overrides default to `gemini-3.5-flash-lite`. `GOOGLE_API_KEY` is also accepted as an alias for `GEMINI_API_KEY`. To use OpenAI instead, set `RECIPE_AI_PROVIDER=openai` and `OPENAI_API_KEY`; its optional model settings are `RECIPE_IMPORT_MODEL` (default `gpt-4o-mini`) and `RECIPE_TRANSCRIPTION_MODEL` (default `whisper-1`). The importer does not switch providers after an error. Without an explicit provider, a Google key selects Gemini; otherwise OpenAI is used.
+
+Keep AI keys server-only: never add a `NEXT_PUBLIC_` prefix or commit `.env.local`. AI-assisted imports send source text, audio, and sampled video images to the selected provider and use that API project's quota or billing. Provider quota and access failures stop further AI requests.
+
+For local dynamic-page/video imports, install Chromium with `npx playwright install chromium`, or set `RECIPE_BROWSER_EXECUTABLE_PATH` to an existing Chromium executable. Linux deployments use the bundled `@sparticuz/chromium` binary; the Next.js configuration includes its assets in the import function's build trace. Browser and media requests validate public IP destinations and enforce transfer/time limits. Video processing runs through separately authenticated requests to fit Netlify's function time and payload limits.
+
 ## Available commands
 
 Run these from `nextjs-app/`:
@@ -100,7 +120,9 @@ End-to-end tests require the same Supabase environment variables as the applicat
 
 ## Deployment
 
-The app is configured for Netlify. Connect the repository to a Netlify site, use `nextjs-app` as the base directory, and add the three environment variables listed above in the site's environment settings. Netlify will run `npm run build` and use the included Next.js plugin.
+The app is configured for Netlify. Connect the repository to a Netlify site, use `nextjs-app` as the base directory, and add the three Supabase environment variables in the site's environment settings. For AI imports, also add `RECIPE_AI_PROVIDER=gemini` and the server-only `GEMINI_API_KEY`, with Functions scope and the deployment contexts you want to test. Redeploy after changing environment variables. Local `.env.local` files are not uploaded.
+
+Netlify runs `npm run build` using Node 22 and automatically applies its current Next.js adapter. The old pinned v4 plugin is removed so App Router API routes use the supported adapter. If the site has a separately configured `AWS_LAMBDA_JS_RUNTIME`, ensure it uses Node 22 or later. Review the PR deploy preview before merging; verify browser startup and an authenticated import in the deployed Linux environment.
 
 ## License
 

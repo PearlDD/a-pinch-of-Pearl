@@ -1,5 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    serverComponentsExternalPackages: ['@sparticuz/chromium', 'playwright-core'],
+    outputFileTracingIncludes: {
+      '/api/recipes/import': ['./node_modules/@sparticuz/chromium/bin/**'],
+    },
+  },
   images: {
     remotePatterns: [
       {
