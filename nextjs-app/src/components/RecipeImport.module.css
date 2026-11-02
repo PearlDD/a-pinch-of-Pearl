@@ -1,0 +1,20 @@
+.panel { margin: 1.5rem 0 2rem; padding: 1.5rem; border: 1px solid #d9c9b6; border-radius: 12px; background: #faf6ee; color: #40352b; }
+.panel h2 { margin-top: 0; font-size: 1.4rem; }
+.panel p { line-height: 1.6; }
+.panel label { display: block; margin: 1rem 0 .4rem; font-weight: 600; }
+.panel input:not([type='checkbox']), .panel textarea { box-sizing: border-box; width: 100%; border: 1px solid #cbbba8; border-radius: 6px; padding: .75rem; background: white; color: #40352b; font: inherit; }
+.panel textarea { resize: vertical; }
+.tabs { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; }
+.tabs button { padding: .6rem .9rem; border: 1px solid #cbbba8; border-radius: 6px; background: white; color: #40352b; cursor: pointer; font: inherit; }
+.tabs button[aria-pressed='true'] { background: #6b4c35; color: white; border-color: #6b4c35; }
+.hint { font-size: .85rem; color: #6e5d4c; }
+.error { color: #a12d20; }
+.preview { margin-top: 1rem; border-top: 1px solid #d9c9b6; padding-top: 1rem; overflow-wrap: anywhere; }
+.preview summary { cursor: pointer; font-weight: 600; }
+.preview li { margin: .5rem 0; line-height: 1.6; }
+.preview dl div { display: flex; gap: 1rem; }
+.preview dt { text-transform: capitalize; }
+.preview dd { margin: 0; }
+.panel .replace { display: flex; align-items: center; gap: .5rem; font-size: .9rem; margin-bottom: 1rem; }
+.panel button:disabled { opacity: .6; cursor: default; }
+@media (max-width: 480px) { .panel { padding: 1rem; } }
