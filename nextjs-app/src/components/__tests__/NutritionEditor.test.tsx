@@ -28,6 +28,7 @@ describe.each([['new', AddRecipePage], ['edit', EditRecipePage]] as const)('%s r
   async function seed() {
     const user = userEvent.setup(); render(<Page />);
     await screen.findByRole('button', { name: 'Auto-calculate Nutrition' });
+    await user.click(screen.getByRole('checkbox', { name: /Estimate unclear amounts/ }));
     if (mode === 'new') await user.type(screen.getByRole('textbox', { name: 'New ingredient' }), '100g flour{Enter}');
     await user.clear(screen.getByLabelText('Servings'));
     await user.type(screen.getByLabelText('Servings'), '1');

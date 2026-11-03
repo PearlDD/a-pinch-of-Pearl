@@ -1,3 +1,5 @@
+import { isIngredientHeading, normalizeFoodText } from './nutritionText';
+import { HOUSEHOLD_MEASURES, STANDARD_PORTIONS } from './nutritionMeasures';
 import { CONTAINERS, MASS_UNITS, VOLUME_ML, parseIngredientLine, parseQuantity, type ParsedIngredient } from './ingredientQuantity';
 
 // Client-side nutrition calculator using USDA reference values
@@ -273,6 +275,7 @@ const NUTRITION_DB: Record<string, NutritionPer100g> = {
   'chia seeds': { calories: 486, carbs: 42.1, protein: 16.5, fat: 30.7, fiber: 34.4 },
   'chia': { calories: 486, carbs: 42.1, protein: 16.5, fat: 30.7, fiber: 34.4 },
   'flax seeds': { calories: 534, carbs: 28.9, protein: 18.3, fat: 42.2, fiber: 27.3 },
+  'ground flaxseed': { calories: 534, carbs: 28.9, protein: 18.3, fat: 42.2, fiber: 27.3 },
   'flaxseed': { calories: 534, carbs: 28.9, protein: 18.3, fat: 42.2, fiber: 27.3 },
   'hemp seeds': { calories: 553, carbs: 8.7, protein: 31.6, fat: 48.8, fiber: 4 },
   'sunflower seeds': { calories: 584, carbs: 20, protein: 20.8, fat: 51.5, fiber: 8.6 },
@@ -661,6 +664,8 @@ export function getVolumeDensity(food: string): number {
 
 const WHOLE_ITEM_GRAMS: Record<string, number> = {
   'egg': 50,
+  'egg white': 33,     // USDA SR 01124, large egg
+  'egg yolk': 17,      // USDA SR 01125, large egg
   'eggs': 50,
   'banana': 120,
   'apple': 180,
@@ -683,7 +688,7 @@ const WHOLE_ITEM_GRAMS: Record<string, number> = {
   'serrano pepper': 7,
   'thai chili': 5,
   'habanero': 8,
-  'garlic': 5,         // per clove
+  'garlic': 3,         // USDA SR 11215, per clove
   'shallot': 30,
   'green onion': 15,
   'scallion': 15,
@@ -722,11 +727,12 @@ export interface NutritionResult extends NutritionValues {
   estimated: number;
   total: number;
   complete: boolean;
+  ignoredLines: string[];
   ingredients: IngredientNutritionReview[];
 }
 
 function foodKey(input: string): string {
-  return input.toLowerCase().replace(/[-–]/g, ' ').replace(/[(),]/g, ' ')
+  return normalizeFoodText(input).replace(/[-–]/g, ' ').replace(/[(),:]/g, ' ')
     .replace(/\b(?:finely|roughly|thinly|fresh|frozen|chopped|diced|minced|sliced|grated|shredded|peeled|cubed|boneless|skinless|trimmed|deveined|thawed|melted|softened|large|medium|small|drained|rinsed|packed|optional|heaping|rounded|level)\b/g, '')
     .replace(/\b(?:to taste|for garnish|for serving|as needed|room temperature)\b/g, '')
     .trim().split(/\s+/).filter(Boolean).map(word => {
@@ -741,19 +747,38 @@ function foodKey(input: string): string {
 const FOOD_REFERENCES = Object.keys(NUTRITION_DB).map(key => ({ key, normalized: foodKey(key) })).sort((a, b) => b.normalized.length - a.normalized.length);
 const PASTA = /\b(?:pasta|spaghetti|penne|macaroni)\b/;
 
-function findFood(parsed: ParsedIngredient): { key: string; issue?: string; note?: string } | null {
+function findFood(parsed: ParsedIngredient, estimateMissing: boolean): { key: string; issue?: string; note?: string } | null {
   let food = foodKey(parsed.food);
+  const aliases: Record<string, string> = {
+    'fine salt': 'salt', 'ground cinnamon': 'cinnamon', 'ground turmeric': 'turmeric',
+    'white pepper powder': 'white pepper', 'black peppercorn': 'black pepper',
+    'gailan': 'chinese broccoli', 'sesame': 'sesame seeds', 'white sesame seed': 'sesame seeds', 'pepper flake': 'red pepper flakes', 'corn oil': 'vegetable oil', 'ground flaxseed': 'ground flaxseed', 'cooked white rice': 'white rice', 'cooked rice': 'white rice', 'silky tofu': 'silken tofu', 'hemp heart': 'hemp seeds', 'hemp seed': 'hemp seeds', 'flex seed': 'flax seeds',
+    'rice cooking wine': 'cooking wine', 'icing sugar': 'powdered sugar',
+    'flour almond': 'almond flour', 'flour patent': 'flour', 'butter unsalted': 'unsalted butter',
+    'bittersweet chocolate chip': 'dark chocolate', 'semisweet chocolate chip': 'chocolate chips', 'sweetened condensed milk': 'condensed milk',
+    'baby bella mushroom': 'mushroom', 'english cucumber': 'cucumber', 'parsley stem': 'parsley', 'green onion stalk': 'green onion',
+    'thai chili pepper': 'thai chili', 'thai pepper': 'thai chili',
+  };
+  const alias = aliases[food];
+  if (alias) food = foodKey(alias);
+  if (estimateMissing && /\b(?:or)\b|\//.test(food)) {
+    const first = parsed.food.split(/\s+or\s+|\//i)[0].trim();
+    const choice = findFood({ ...parsed, food: first }, false);
+    if (choice && !choice.issue) return { ...choice, note: `Alternative ingredients: assuming ${first}; choose the actual ingredient for accuracy.` };
+  }
   if (!food) return null;
+  if (estimateMissing && food === 'kalamata olive') return { key: 'olives', note: 'Using a generic ripe olive nutrition/household-weight reference for Kalamata olives; variety and product values can differ.' };
   if (PASTA.test(food) && /^(?:(?:dry|uncooked|raw|cooked) )?(?:pasta|spaghetti|penne|macaroni)(?: (?:dry|uncooked|raw|cooked))?$/.test(food)) {
     if (/\b(?:dry|uncooked|raw)\b/.test(food)) return { key: 'dry pasta' };
     if (/\bcooked\b/.test(food)) return { key: 'cooked pasta' };
+    if (estimateMissing) return { key: 'dry pasta', note: 'Assuming dry pasta; enter cooked explicitly if the weight is cooked.' };
     if (FOOD_REFERENCES.some(item => item.normalized === food)) return { key: 'pasta', issue: 'Specify whether the pasta amount is dry or cooked.' };
   }
   if (/^(?:fresh|raw) anchovy(?: fillet)?$/.test(foodKey(parsed.food.replace(/^fresh\b/, 'raw')))) return { key: 'raw anchovies' };
   if (/^(?:canned )?anchovy(?: fillet)?$/.test(food)) return { key: 'canned anchovies', ...(!food.startsWith('canned ') ? { note: 'Using canned, drained anchovy fillets; specify raw anchovies if different.' } : {}) };
   if (CONTAINERS.has(parsed.unit) && food === 'tuna') food = 'canned tuna';
   const exact = FOOD_REFERENCES.find(item => item.normalized === food);
-  if (exact) return { key: exact.key };
+  if (exact) return { key: exact.key, ...(alias ? { note: `Using ${exact.key} as the reference for ${parsed.food}; variety/product values can differ.` } : {}) };
   // Only discard known preparation suffixes. No reverse substring lookup or
   // shared-word scoring: "pasta water" must not become pasta, nor "vegetables"
   // vegetable broth. Preserve canned/dried/ground/raw/cooked distinctions.
@@ -763,7 +788,7 @@ function findFood(parsed: ParsedIngredient): { key: string; issue?: string; note
   return null;
 }
 
-function resolveGrams(parsed: ParsedIngredient, key: string | null): { grams: number | null; estimated: boolean; note?: string; issue?: string } {
+function resolveGrams(parsed: ParsedIngredient, key: string | null, estimateMissing: boolean): { grams: number | null; estimated: boolean; note?: string; issue?: string } {
   const { quantity, unit } = parsed;
   const fail = (issue: string) => ({ grams: null, estimated: false, issue });
   if (parsed.issue) return fail(parsed.issue);
@@ -771,27 +796,57 @@ function resolveGrams(parsed: ParsedIngredient, key: string | null): { grams: nu
     if (parsed.weightIsPerItem && quantity === null) return fail('Specify how many items use the per-item weight.');
     return { grams: parsed.weight * (parsed.weightIsPerItem ? quantity! : 1), estimated: parsed.approximate };
   }
+  if (estimateMissing && key && (quantity === null || /^(?:portions?|servings?)$/.test(unit)) && !parsed.issue) {
+    const standard = STANDARD_PORTIONS[key];
+    if (standard !== undefined) return { grams: (quantity ?? 1) * standard, estimated: true, note: `Standard portion estimate: ${standard} g per portion of ${key} (FDA RACC reference). Actual amount was not provided.` };
+  }
+  if (estimateMissing && key && /^(?:pieces?|bowls?|handfuls?)$/.test(unit) && STANDARD_PORTIONS[key] !== undefined) return { grams: (quantity ?? 1) * STANDARD_PORTIONS[key], estimated: true, note: `Unspecified household size: treating each ${unit} as one standard portion of ${key} (${STANDARD_PORTIONS[key]} g). The actual size is unknown.` };
+  if (estimateMissing && quantity === null && key && HOUSEHOLD_MEASURES[key]) {
+    const reference = HOUSEHOLD_MEASURES[key];
+    const ml = reference.volume[5] !== undefined ? 5 : reference.volume[15] !== undefined ? 15 : null;
+    if (ml) return { grams: reference.volume[ml], estimated: true, note: `Unspecified amount: assuming one ${ml === 5 ? 'teaspoon' : 'tablespoon'} (${reference.volume[ml]} g), ${reference.source || `USDA SR ${reference.sr}`}.` };
+  }
+  if (estimateMissing && quantity === null && key) {
+    const count = Object.entries(WHOLE_ITEM_GRAMS).find(([name]) => foodKey(name) === foodKey(key));
+    if (count) return { grams: count[1], estimated: true, note: `Unspecified amount: assuming one ${count[0]} (${count[1]} g).` };
+    if (VOLUME_DENSITY_G_PER_ML[key] !== undefined || /\b(?:wine|sauce|milk|cream|water|juice|oil)\b/.test(key)) {
+      const ml = /sugar|starch|flour|powder/.test(key) ? 5 : 15;
+      return { grams: ml * getVolumeDensity(key), estimated: true, note: `Unspecified amount: assuming one ${ml === 5 ? 'teaspoon' : 'tablespoon'} (${ml} ml) of ${key}, using reference density.` };
+    }
+  }
   if (quantity === null) {
     if (key && Object.values(NUTRITION_DB[key]).every(value => value === 0)) return { grams: 0, estimated: false, note: 'No calories or macros in this reference; an amount is not required.' };
     return fail('Specify an amount, preferably in grams.');
   }
   if (CONTAINERS.has(unit)) {
+    if (parsed.packageWeight === null && estimateMissing && key === 'canned tuna' && /^(?:can|cans|tin|tins)$/.test(unit)) return { grams: quantity * 113, estimated: true, note: `Package estimate: assuming 113 g drained tuna per can; using ${quantity} can(s). Can sizes vary. Replace with the label's drained weight when available.` };
     if (parsed.packageWeight === null) return fail('Package sizes vary. Add its edible/drained weight, e.g. ¼ can (113 g drained) tuna.');
     return { grams: quantity * parsed.packageWeight, estimated: parsed.approximate || !parsed.packageWeightIsEdible, note: parsed.packageWeightIsEdible ? 'Using the stated edible/drained weight per package.' : 'Using the stated package weight, which may include packing liquid. Confirm its edible/drained weight.' };
   }
   if (MASS_UNITS[unit]) return { grams: quantity * MASS_UNITS[unit], estimated: parsed.approximate };
   if (VOLUME_ML[unit]) {
+    const reference = key && HOUSEHOLD_MEASURES[key];
+    if (reference) {
+      const ml = VOLUME_ML[unit];
+      const baseMl = reference.volume[ml] !== undefined ? ml : Number(Object.keys(reference.volume)[0]);
+      const grams = reference.volume[baseMl] * ml / baseMl;
+      return { grams: quantity * grams, estimated: true, note: `Household estimate: ${grams} g per ${unit}, ${reference.source || `USDA SR ${reference.sr}`}. Preparation and packing can change this weight.` };
+    }
     const liquid = key && /\b(?:milk|cream|broth|stock|water|juice|vinegar|wine|sauce)\b/.test(key);
     const knownDensity = key && (VOLUME_DENSITY_G_PER_ML[key] !== undefined || /flour|starch|powder|oil|syrup|honey|butter|oat/.test(key));
     if (!key || (!liquid && !knownDensity)) return fail(`No reliable ${unit}-to-gram conversion for this food. Enter its weight in grams.`);
     const density = getVolumeDensity(key);
     return { grams: quantity * VOLUME_ML[unit] * density, estimated: true, note: `Volume estimate: ${VOLUME_ML[unit]} ml per ${unit}, reference density ${density} g/ml.` };
   }
+  if (estimateMissing && key === 'parsley' && /stems?|sprigs?/.test(parsed.food)) return { grams: quantity, estimated: true, note: 'Herb count estimate: 1 g per parsley stem/sprig, based on USDA SR 11297 sprigs. Weigh stems for accuracy.' };
+  if (key === 'parsley' && /^sprigs?$/.test(unit)) return { grams: quantity, estimated: true, note: 'USDA SR 11297: approximately 1 g per parsley sprig.' };
+  if (key === 'cilantro' && /^sprigs?$/.test(unit)) return { grams: quantity * 20 / 9, estimated: true, note: 'USDA SR 11165: 20 g per 9 cilantro sprigs.' };
+  if (key === 'ginger' && /^slices?$/.test(unit)) return { grams: quantity * 2.2, estimated: true, note: 'USDA SR 11216: 11 g per 5 slices (1 inch diameter). Actual slices vary.' };
   if (key === 'canned anchovies' && (!unit || /^fillets?$/.test(unit))) {
     return { grams: quantity * 4, estimated: true, note: 'Count estimate: 4 g per canned anchovy fillet (USDA SR 15002). Use grams for an exact amount.' };
   }
   if (unit === 'pinch' || unit === 'pinches' || unit === 'dash' || unit === 'dashes') return { grams: quantity * (unit.startsWith('pinch') ? 0.5 : 0.6), estimated: true, note: 'Using an approximate pinch/dash weight; use grams for accuracy.' };
-  if (!unit || (key === 'garlic' && /^cloves?$/.test(unit)) || (key === 'celery' && /^stalks?$/.test(unit))) {
+  if (!unit || unit === 'each' || (key === 'garlic' && /^cloves?$/.test(unit)) || ((key === 'celery' || key === 'green onion' || key === 'scallion') && /^stalks?$/.test(unit))) {
     const item = Object.entries(WHOLE_ITEM_GRAMS).find(([name]) => foodKey(name) === foodKey(key || ''));
     if (item) return { grams: quantity * item[1], estimated: true, note: `Count estimate: ${item[1]} g per ${item[0]}. Actual size can vary; use grams for accuracy.` };
   }
@@ -805,31 +860,56 @@ export function parseRecipeServings(text: string): number {
   return number;
 }
 
+/** Range servings are permitted only in explicitly selected estimate mode. */
+export function resolveNutritionServings(text: string, estimateMissing: boolean): { count: number; note: string } {
+  if (!text.trim()) return { count: 1, note: 'Servings are blank: showing whole-recipe totals.' };
+  try { return { count: parseRecipeServings(text), note: '' }; }
+  catch (error) {
+    const cleaned = text.trim().toLowerCase().replace(/^serves?\s+/, '').replace(/\s+(?:servings?|people|persons?)$/, '');
+    const parts = cleaned.split(/\s*(?:-|–|to)\s*/);
+    const numbers = parts.map(parseQuantity);
+    if (estimateMissing && parts.length === 2 && numbers.every((value): value is number => value !== null && Number.isFinite(value) && value > 0) && numbers[0]! <= numbers[1]!) {
+      const count = (numbers[0]! + numbers[1]!) / 2;
+      return { count, note: `Serving estimate: using midpoint ${count} of ${text}. Values are per estimated serving.` };
+    }
+    throw error;
+  }
+}
+
 /** Fresh, deterministic calculation on every call; no ingredient/result cache.
  * Incomplete inputs return a review with EMPTY values, never partial totals that
  * could be mistaken for the nutrition of the complete recipe.
  */
-export function calculateNutrition(ingredientLines: string[], servings: number): NutritionResult {
+export function calculateNutrition(ingredientLines: string[], servings: number, options: { estimateMissing?: boolean } = {}): NutritionResult {
   if (!Number.isFinite(servings) || servings <= 0) throw new Error('Servings must be a positive finite number.');
-  const lines = ingredientLines.flatMap(line => line.split(/\r?\n/)).map(line => line.trim()).filter(Boolean);
+  const estimateMissing = options.estimateMissing ?? false;
+  const allLines = ingredientLines.flatMap(line => line.split(/\r?\n/)).map(line => line.trim()).filter(Boolean);
+  const ignoredLines = allLines.filter(isIngredientHeading);
+  const lines = allLines.filter(line => !isIngredientHeading(line));
   if (!lines.length) throw new Error('Add at least one ingredient before calculating nutrition.');
   const totals: NutritionPer100g = { calories: 0, carbs: 0, protein: 0, fat: 0, fiber: 0 };
   const ingredients = lines.map(line => {
     const parsed = parseIngredientLine(line);
-    const match = findFood(parsed);
-    const amount = resolveGrams(parsed, match?.key || null);
-    const issues = [!match ? 'Food not identified. Use a specific ingredient name.' : match.issue, amount.issue].filter((item): item is string => !!item);
+    let rangeNote: string | undefined;
+    if (estimateMissing && parsed.range && parsed.issue === 'Choose one amount instead of a range.' && Number.isFinite(parsed.range.min) && Number.isFinite(parsed.range.max) && parsed.range.min <= parsed.range.max) {
+      parsed.quantity = (parsed.range.min + parsed.range.max) / 2;
+      parsed.issue = undefined; parsed.approximate = true;
+      rangeNote = `Quantity range estimate: using midpoint ${parsed.quantity} of ${parsed.range.min}–${parsed.range.max}.`;
+    }
+    const match = findFood(parsed, estimateMissing);
+    const amount = resolveGrams(parsed, match?.key || null, estimateMissing);
+    const issues = [!match ? (/\bor\b|\//.test(parsed.food) ? 'Choose one specific ingredient from the alternatives, or provide its nutrition reference.' : 'Food not identified. Use a specific ingredient name.') : match.issue, amount.issue].filter((item): item is string => !!item);
     let grams = amount.grams;
     if (grams !== null && (!Number.isFinite(grams) || grams < 0)) { issues.push('The ingredient weight is invalid.'); grams = null; }
-    const notes = [match?.note, amount.note].filter((item): item is string => !!item);
+    const notes = [match?.note, amount.note, rangeNote, parsed.approximate ? 'The stated amount is approximate.' : undefined].filter((item): item is string => !!item);
     if (match && grams !== null && !issues.length) {
       for (const name of Object.keys(totals) as (keyof NutritionPer100g)[]) totals[name] += NUTRITION_DB[match.key][name] * (grams / 100);
     }
     return { line, food: match?.key || null, grams, estimated: amount.estimated || !!match?.note, issues, notes };
   });
   const complete = ingredients.every(item => item.issues.length === 0);
-  if (!Object.values(totals).every(value => Number.isFinite(value / servings))) throw new Error('Nutrition values are out of range. Check ingredient weights and servings.');
+  if (!Object.values(totals).every(value => Number.isFinite(value / servings * 10))) throw new Error('Nutrition values are out of range. Check ingredient weights and servings.');
   const macros = (value: number) => `${Math.round(value / servings * 10) / 10}g`;
   const values = complete ? { calories: `~${Math.round(totals.calories / servings)} kcal`, carbs: macros(totals.carbs), protein: macros(totals.protein), fat: macros(totals.fat), fiber: macros(totals.fiber) } : EMPTY_NUTRITION;
-  return { ...values, matched: ingredients.filter(item => item.food).length, quantified: ingredients.filter(item => item.grams !== null).length, estimated: ingredients.filter(item => item.estimated).length, total: ingredients.length, complete, ingredients };
+  return { ...values, matched: ingredients.filter(item => item.food).length, quantified: ingredients.filter(item => item.grams !== null).length, estimated: ingredients.filter(item => item.estimated).length, total: ingredients.length, complete, ignoredLines, ingredients };
 }

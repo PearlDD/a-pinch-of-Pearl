@@ -1,3 +1,4 @@
+import recipes from '../src/lib/__tests__/fixtures/publishedRecipes.json';
 import { test, expect } from '@playwright/test';
 
 // A real layout is essential: textarea blur can move the calculation button
@@ -26,6 +27,7 @@ for (const mode of ['new', 'edit']) {
     const pending = page.getByRole('textbox', { name: 'New ingredient', exact: true });
     const row = (text: string) => page.locator('span[title="Click to edit"]').filter({ hasText: text });
     await expect(button).toBeVisible();
+    await page.getByRole('checkbox', { name: /Estimate unclear amounts/ }).uncheck();
     await page.getByLabel('Servings', { exact: true }).fill('1');
     if (mode === 'new') { await pending.fill('100g flour'); await pending.press('Enter'); }
     await calculate();
@@ -57,3 +59,34 @@ for (const mode of ['new', 'edit']) {
     await expect(page.getByText(/1\/1 foods identified/)).toContainText('0/1 amounts resolved');
   });
 }
+
+
+test('default estimates handle the exact published tuna recipe and strict mode can be restored', async ({ page, isMobile }) => {
+  const recipe = recipes.find(item => item.name === 'Spaghetti with Tuna')!;
+  await page.goto('/admin/recipes/new');
+  const button = page.getByRole('button', { name: 'Auto-calculate Nutrition' });
+  const calculate = () => isMobile ? button.tap() : button.click();
+  const policy = page.getByRole('checkbox', { name: /Estimate unclear amounts/ });
+  await expect(policy).toBeChecked();
+  await page.getByLabel('Servings', { exact: true }).fill('1');
+  const pending = page.getByRole('textbox', { name: 'New ingredient', exact: true });
+  for (const line of recipe.ingredients.split('\n')) { await pending.fill(line); await pending.press('Enter'); }
+  await calculate();
+  await expect(page.getByText(/9\/9 foods identified/)).toContainText('9 estimated');
+  const protein = page.getByLabel('Protein', { exact: true });
+  const original = await protein.inputValue();
+  expect(parseFloat(original)).toBeGreaterThan(0);
+  expect(parseFloat(original)).toBeLessThan(30);
+  await page.getByText('Review ingredient amounts and assumptions', { exact: true }).click();
+  await expect(page.getByText(/Standard portion estimate: 55 g/)).toBeVisible();
+  await expect(page.getByText(/Package estimate: assuming 113 g/)).toBeVisible();
+  await policy.uncheck(); await calculate();
+  await expect(protein).toHaveValue('');
+  await expect(page.locator('p[role="alert"]')).toBeVisible();
+  await policy.check(); await calculate();
+  await expect(protein).toHaveValue(original);
+  await page.locator('span[title="Click to edit"]').filter({ hasText: '1 portion of spaghetti' }).click();
+  await page.getByLabel('Edit ingredient 1', { exact: true }).fill('110g dry spaghetti');
+  await calculate();
+  expect(parseFloat(await protein.inputValue())).toBeGreaterThan(parseFloat(original));
+});

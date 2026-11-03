@@ -1,16 +1,17 @@
 'use client';
 
 import { useState, type RefObject } from 'react';
-import { calculateNutrition, EMPTY_NUTRITION, parseRecipeServings, type NutritionResult, type NutritionValues } from '@/lib/nutritionCalculator';
+import { calculateNutrition, EMPTY_NUTRITION, resolveNutritionServings, type NutritionResult, type NutritionValues } from '@/lib/nutritionCalculator';
 import type { ListInputHandle } from './ListInput';
 import styles from './NutritionCalculator.module.css';
 
 export default function NutritionCalculator({ ingredients, servings, editorRef, draftVersion, onCalculated }: {
   ingredients: string[]; servings: string; editorRef: RefObject<ListInputHandle>; draftVersion: number; onCalculated: (values: NutritionValues) => void;
 }) {
-  const [last, setLast] = useState<{ result: NutritionResult; snapshot: string; draft: number } | null>(null);
+  const [last, setLast] = useState<{ result: NutritionResult; snapshot: string; draft: number; servingsNote: string } | null>(null);
+  const [estimateMissing, setEstimateMissing] = useState(true);
   const [error, setError] = useState('');
-  const snapshot = JSON.stringify({ ingredients, servings });
+  const snapshot = JSON.stringify({ ingredients, servings, estimateMissing });
   const stale = !!last && (last.snapshot !== snapshot || last.draft !== draftVersion);
 
   const recalculate = () => {
@@ -19,9 +20,10 @@ export default function NutritionCalculator({ ingredients, servings, editorRef, 
       // Do not wait for setState or a blur event: calculate this exact visible
       // snapshot, including an edited row or a not-yet-added ingredient.
       const current = editorRef.current?.commit() ?? [...ingredients];
-      const count = servings.trim() ? parseRecipeServings(servings) : 1;
-      const result = calculateNutrition(current, count);
-      setLast({ result, snapshot: JSON.stringify({ ingredients: current, servings }), draft: draftVersion });
+      const serving = resolveNutritionServings(servings, estimateMissing);
+      const count = serving.count;
+      const result = calculateNutrition(current, count, { estimateMissing });
+      setLast({ result, snapshot: JSON.stringify({ ingredients: current, servings, estimateMissing }), draft: draftVersion, servingsNote: serving.note });
       onCalculated(result);
       if (!result.complete) setError('Nutrition could not be calculated for the complete recipe. Resolve the items below and recalculate. Previous values have been cleared.');
     } catch (err) {
@@ -36,6 +38,10 @@ export default function NutritionCalculator({ ingredients, servings, editorRef, 
       // Saving on blur can move this button between pointer-down and click.
       onPointerDown={event => event.preventDefault()}
       onClick={recalculate}>Auto-calculate Nutrition</button>
+    <label className={styles.hint} style={{ display: 'block', marginTop: '0.5rem' }}>
+      <input type="checkbox" checked={estimateMissing} onChange={event => setEstimateMissing(event.target.checked)} />{' '}
+      Estimate unclear amounts using standard portions (review assumptions)
+    </label>
     <div aria-live="polite">
       {stale ? <p className={styles.warning}>Ingredients or servings changed. Recalculate to update nutrition and matching.</p> : <>
         {error && <p role="alert" className={styles.error}>{error}</p>}
@@ -44,7 +50,8 @@ export default function NutritionCalculator({ ingredients, servings, editorRef, 
             {last.result.matched}/{last.result.total} foods identified ({Math.round(last.result.matched / last.result.total * 100)}%).{' '}
             {last.result.quantified}/{last.result.total} amounts resolved; {last.result.estimated} estimated.
           </p>
-          <p className={styles.hint}>Food matching does not establish quantity accuracy. Values use approximate food references.{!servings.trim() && ' Servings are blank: showing whole-recipe totals. Enter servings for per-serving values.'}</p>
+          <p className={styles.hint}>Food matching does not establish quantity accuracy. Values use approximate food references.{' '}{last.servingsNote}</p>
+          {last.result.ignoredLines.length > 0 && <p className={styles.hint}>Section headings excluded: {last.result.ignoredLines.join(', ')}</p>}
           <details open={!last.result.complete}>
             <summary>Review ingredient amounts and assumptions</summary>
             <ul className={styles.review}>
