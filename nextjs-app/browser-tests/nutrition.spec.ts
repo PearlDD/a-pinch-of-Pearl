@@ -55,8 +55,8 @@ for (const mode of ['new', 'edit']) {
     await row('200g flour').click();
     await page.getByLabel('Edit ingredient 1', { exact: true }).fill('¼ can tuna');
     await calculate();
-    await expect(page.locator('p[role="alert"]')).toContainText('Previous values have been cleared');
-    await expect(calories).toHaveValue('');
+    await expect(page.locator('p[role="alert"]')).toContainText('Existing nutrition values were kept');
+    await expect(calories).toHaveValue('~728 kcal');
     await expect(page.getByText(/1\/1 foods identified/)).toContainText('0/1 amounts resolved');
   });
 }
@@ -82,8 +82,8 @@ test('default estimates handle the exact published tuna recipe and strict mode c
   await expect(page.getByText(/Standard portion estimate: 55 g/)).toBeVisible();
   await expect(page.getByText(/Package estimate: assuming 113 g/)).toBeVisible();
   await policy.uncheck(); await calculate();
-  await expect(protein).toHaveValue('');
-  await expect(page.locator('p[role="alert"]')).toBeVisible();
+  await expect(protein).toHaveValue(original);
+  await expect(page.locator('p[role="alert"]')).toContainText('have not been updated');
   await policy.check(); await calculate();
   await expect(protein).toHaveValue(original);
   await page.locator('span[title="Click to edit"]').filter({ hasText: '1 portion of spaghetti' }).click();
