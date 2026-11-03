@@ -86,6 +86,20 @@ Keep AI keys server-only: never add a `NEXT_PUBLIC_` prefix or commit `.env.loca
 
 For local dynamic-page/video imports, install Chromium with `npx playwright install chromium`, or set `RECIPE_BROWSER_EXECUTABLE_PATH` to an existing Chromium executable. Linux deployments use the bundled `@sparticuz/chromium` binary; the Next.js configuration includes its assets in the import function's build trace. Browser and media requests validate public IP destinations and enforce transfer/time limits. Video processing runs through separately authenticated requests to fit Netlify's function time and payload limits.
 
+## Auto-calculate nutrition
+
+Both recipe editors calculate from the complete current ingredient list, including the row being edited and text waiting in **+ Add**. Every click reparses quantities and food names from scratch. Editing ingredients or servings marks a previous calculation as stale; an unsuccessful calculation clears all five previous nutrition values and explains what needs fixing. Saving also commits the visible ingredient draft.
+
+The feedback separates **foods identified**, **amounts resolved**, and **estimates**, and lists reference weights and assumptions. A 100% food identification rate does not establish quantity accuracy. The default **Estimate unclear amounts using standard portions** option allows a missing quantity to use a food-specific standard portion. For example, an unspecified pasta portion assumes 55 g dry pasta; ¼ can tuna without a package weight uses one quarter of a stated 113 g drained-can reference. Each assumption is labelled for review, and measured amounts always take precedence. Quantity and serving ranges use a labelled midpoint in estimate mode. Blank servings display whole-recipe totals.
+
+Turn the estimate option off to require explicit quantities for ambiguous portions/packages, preparation states and ranges. Unsupported foods or quantities still prevent a complete total and show actionable issues; neither mode invents a universal 100 g item or 400 g package. Recipes remain optional/editable nutrition estimates, rather than product-specific label data. Existing saved recipes are not automatically rewritten when code is deployed: recalculate, review and save in the editor.
+
+Parsing supports Unicode/ASCII fractions, food-first quantities (`Garlic: 3 cloves, minced`), compatible additive measures (`¼ cup + 2½ tablespoons flour`), explicit package weights, common Chinese quantities/units/names, and recognized preparation notes. Section headings are excluded and disclosed. Brands, unspecified ingredient mixtures and unfamiliar units still need a matching reference or clarification; do not interpret an unsupported record as a verified nutrition result.
+
+Common count/volume conversions use ingredient-specific estimates (including separate egg yolk/white weights). Dry/cooked pasta, canned fish, ground meat and sun-dried descriptors remain distinct. Household measures and the added pasta/anchovy data use [USDA SR28](https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip); standard portions use [FDA RACC examples](https://www.fda.gov/media/102587/download). Chia spoon weight uses the [Bob’s Red Mill label](https://www.bobsredmill.com/product/organic-chia-seed) (2 tbsp = 26 g). The missing-can-size estimate uses a [113 g drained tuna example](https://www.bumblebee.com/products/cans/bumble-bee-prime-solid-white-albacore-tuna-in-water-low-sodium/). Product sizes/compositions vary and assumptions are shown rather than treated as measurements. This calculator runs locally in the browser and makes no AI/API calls.
+
+The regression fixtures include all 40 published recipes captured on 2026-11-02, with explicit checks for the original Tuna Spaghetti quantities, editing, standard portions, strict mode, unknown references and incomplete calculations.
+
 ## Available commands
 
 Run these from `nextjs-app/`:
@@ -100,8 +114,10 @@ Run these from `nextjs-app/`:
 | `npm run test:coverage` | Run Jest with coverage reporting |
 | `npm run test:e2e` | Run Playwright end-to-end tests |
 | `npm run test:e2e:ui` | Open Playwright's interactive test runner |
+| `npm run test:nutrition-browser` | Run isolated desktop/touch nutrition editor regressions with mocked Supabase |
 
 End-to-end tests require the same Supabase environment variables as the application.
+The isolated nutrition browser suite uses fake auth and recipe data, needs no API keys, and starts its own server on port 3005. Install Chromium first with `npx playwright install chromium` and stop any development server using that port before running it.
 
 ## Project structure
 

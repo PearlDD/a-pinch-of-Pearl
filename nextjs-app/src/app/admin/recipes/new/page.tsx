@@ -1,14 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
 import { uploadPhoto } from '@/lib/uploadPhoto';
-import { calculateNutrition } from '@/lib/nutritionCalculator';
+import type { NutritionValues } from '@/lib/nutritionCalculator';
 import { CATEGORIES, formatCategories } from '@/lib/types';
-import ListInput from '@/components/ListInput';
+import ListInput, { type ListInputHandle } from '@/components/ListInput';
+import NutritionCalculator from '@/components/NutritionCalculator';
 import RecipeImport from '@/components/RecipeImport';
 import type { ImportedRecipe } from '@/lib/recipeImport';
 import styles from './recipeForm.module.css';
@@ -36,7 +37,8 @@ export default function AddRecipePage() {
   const [photoUrl, setPhotoUrl] = useState('');
   const [photos, setPhotos] = useState('');
   const [sourceUrl, setSourceUrl] = useState('');
-  const [matchRate, setMatchRate] = useState('');
+  const ingredientsRef = useRef<ListInputHandle>(null);
+  const [ingredientDraftVersion, setIngredientDraftVersion] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [additionalUploading, setAdditionalUploading] = useState(false);
 
@@ -57,7 +59,6 @@ export default function AddRecipePage() {
     fill(setSourceUrl, recipe.source_url);
     if (recipe.ingredients.length) {
       setIngredientsList(current => replace || !current.some(item => item.trim()) ? recipe.ingredients : current);
-      setMatchRate('');
     }
     if (recipe.instructions.length) setInstructionsList(current => replace || !current.some(item => item.trim()) ? recipe.instructions : current);
     if (recipe.tips.length) setTipsList(current => replace || !current.some(item => item.trim()) ? recipe.tips : current);
@@ -135,19 +136,17 @@ export default function AddRecipePage() {
     if (!authLoading && !user) router.push('/admin/login');
   }, [user, authLoading, router]);
 
-  const handleAutoNutrition = () => {
-    const servingsNum = parseInt(servings, 10) || 1;
-    const result = calculateNutrition(ingredientsList, servingsNum);
-    setCalories(result.calories);
-    setCarbs(result.carbs);
-    setProtein(result.protein);
-    setFat(result.fat);
-    setFiber(result.fiber);
-    setMatchRate(`${result.matched}/${result.total}`);
+  const applyNutrition = (values: NutritionValues) => {
+    setCalories(values.calories);
+    setCarbs(values.carbs);
+    setProtein(values.protein);
+    setFat(values.fat);
+    setFiber(values.fiber);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const currentIngredients = ingredientsRef.current?.commit() ?? ingredientsList;
     setError('');
 
     if (!name.trim()) {
@@ -168,7 +167,7 @@ export default function AddRecipePage() {
       prep_time: prepTime.trim(),
       cook_time: cookTime.trim(),
       servings: servings.trim(),
-      ingredients: ingredientsList.join('\n'),
+      ingredients: currentIngredients.join('\n'),
       instructions: instructionsList.join('\n'),
       tips: tipsList.join('\n'),
       photo_url: photoUrl.trim(),
@@ -282,6 +281,7 @@ export default function AddRecipePage() {
             <label>Servings</label>
             <input
               type="text"
+              aria-label="Servings"
               value={servings}
               onChange={(e) => setServings(e.target.value)}
               placeholder="e.g. 4"
@@ -291,6 +291,9 @@ export default function AddRecipePage() {
           <div className={styles.formGroup}>
             <label>Ingredients</label>
             <ListInput
+              ref={ingredientsRef}
+              itemLabel="ingredient"
+              onDraftChange={() => setIngredientDraftVersion(version => version + 1)}
               items={ingredientsList}
               onChange={setIngredientsList}
               placeholder="e.g. 2 cups flour"
@@ -299,40 +302,33 @@ export default function AddRecipePage() {
 
           <div className={styles.formGroup}>
             <label>Nutrition Info (optional)</label>
-            <button
-              type="button"
-              className={styles.autoNutritionBtn}
-              onClick={handleAutoNutrition}
-              disabled={ingredientsList.length === 0}
-            >
-              Auto-calculate Nutrition
-            </button>
-            {matchRate && (() => {
-              const [matched, total] = matchRate.split('/').map(Number);
-              const pct = total > 0 ? (matched / total) * 100 : 0;
-              const colorClass = pct >= 80 ? styles.matchRateGreen : pct >= 60 ? styles.matchRateAmber : styles.matchRateRed;
-              return <p className={`${styles.matchRate} ${colorClass}`}>{matchRate} ingredients matched ({Math.round(pct)}%)</p>;
-            })()}
+            <NutritionCalculator
+              ingredients={ingredientsList}
+              servings={servings}
+              editorRef={ingredientsRef}
+              draftVersion={ingredientDraftVersion}
+              onCalculated={applyNutrition}
+            />
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
                 <label>Calories</label>
-                <input type="text" value={calories} onChange={(e) => setCalories(e.target.value)} placeholder="e.g. 250 kcal" />
+                <input type="text" aria-label="Calories" value={calories} onChange={(e) => setCalories(e.target.value)} placeholder="e.g. 250 kcal" />
               </div>
               <div className={styles.formGroup}>
                 <label>Carb</label>
-                <input type="text" value={carbs} onChange={(e) => setCarbs(e.target.value)} placeholder="e.g. 30g" />
+                <input type="text" aria-label="Carbohydrates" value={carbs} onChange={(e) => setCarbs(e.target.value)} placeholder="e.g. 30g" />
               </div>
               <div className={styles.formGroup}>
                 <label>Protein</label>
-                <input type="text" value={protein} onChange={(e) => setProtein(e.target.value)} placeholder="e.g. 15g" />
+                <input type="text" aria-label="Protein" value={protein} onChange={(e) => setProtein(e.target.value)} placeholder="e.g. 15g" />
               </div>
               <div className={styles.formGroup}>
                 <label>Fat</label>
-                <input type="text" value={fat} onChange={(e) => setFat(e.target.value)} placeholder="e.g. 10g" />
+                <input type="text" aria-label="Fat" value={fat} onChange={(e) => setFat(e.target.value)} placeholder="e.g. 10g" />
               </div>
               <div className={styles.formGroup}>
                 <label>Fiber</label>
-                <input type="text" value={fiber} onChange={(e) => setFiber(e.target.value)} placeholder="e.g. 5g" />
+                <input type="text" aria-label="Fiber" value={fiber} onChange={(e) => setFiber(e.target.value)} placeholder="e.g. 5g" />
               </div>
             </div>
           </div>
