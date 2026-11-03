@@ -1,9 +1,10 @@
 import { Metadata } from 'next';
-import { createClient } from '@supabase/supabase-js';
+import { createServerSupabase } from '@/lib/serverSupabase';
 import RecipeDetailClient from './RecipeDetailClient';
 import logger from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
 
 // Generate Open Graph metadata for social sharing
 export async function generateMetadata({
@@ -11,10 +12,7 @@ export async function generateMetadata({
 }: {
   params: { id: string };
 }): Promise<Metadata> {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabase = createServerSupabase();
 
   const { data: recipe } = await supabase
     .from('recipes')
@@ -54,10 +52,7 @@ export default async function RecipeDetailPage({
 }: {
   params: { id: string };
 }) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabase = createServerSupabase();
 
   const { data: recipe } = await supabase
     .from('recipes')

@@ -4,19 +4,21 @@ import AddRecipePage from '@/app/admin/recipes/new/page';
 import EditRecipePage from '@/app/admin/recipes/[id]/edit/page';
 import { mockSupabase } from '@/__tests__/mocks/supabase';
 import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 
 jest.mock('@/hooks/useAuth', () => {
   const user = { id: 'admin' };
   return { useAuth: jest.fn(() => ({ user, loading: false })) };
 });
-jest.mock('next/navigation', () => ({
-  useParams: () => ({ id: 'recipe-1' }),
-  useRouter: () => ({ push: jest.fn() }),
-}));
+jest.mock('next/navigation', () => {
+  const router = { push: jest.fn(), refresh: jest.fn() };
+  return { useParams: () => ({ id: 'recipe-1' }), useRouter: () => router };
+});
 
 describe.each([['new', AddRecipePage], ['edit', EditRecipePage]] as const)('%s recipe nutrition', (mode, Page) => {
   let query: ReturnType<typeof mockSupabase.from>;
   beforeEach(() => {
+    (useRouter().refresh as jest.Mock).mockClear();
     (useAuth as jest.Mock).mockReturnValue({ user: { id: 'admin' }, loading: false });
     query = { ...mockSupabase.from(),
       single: jest.fn().mockResolvedValue({ data: { name: 'Test recipe', category: 'Main Dish', ingredients: '100g flour', servings: '1' }, error: null }),
@@ -139,6 +141,7 @@ describe.each([['new', AddRecipePage], ['edit', EditRecipePage]] as const)('%s r
     if (mode === 'new') await user.type(screen.getByPlaceholderText("e.g. Grandma's Chicken Soup"), 'Test recipe');
     await user.click(screen.getByRole('button', { name: /Save Recipe|Update Recipe/ }));
     await waitFor(() => expect(mode === 'new' ? query.insert : query.update).toHaveBeenCalledWith(expect.objectContaining({ ingredients: '100g flour\n100g honey' })));
+    if (mode === 'edit') expect(useRouter().refresh).toHaveBeenCalledTimes(1);
   });
 });
 
