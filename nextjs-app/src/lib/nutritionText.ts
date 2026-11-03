@@ -1,6 +1,8 @@
 /** Syntax normalization only: never supplies a missing food amount. */
 const chineseNumbers: Record<string, string> = { 一: '1', 二: '2', 两: '2', 三: '3', 四: '4', 五: '5', 六: '6', 七: '7', 八: '8', 九: '9', 十: '10', 半: '1/2' };
 const chineseFoods: Record<string, string> = {
+  牛大骨: 'beef bones', 整只鸡: 'whole chicken', 糍粑辣椒: 'ciba chili paste', 二荆条: 'dried chili pepper', 子弹头: 'dried chili pepper', 七星椒: 'dried chili pepper',
+  沙姜: 'galangal', 陈皮: 'dried tangerine peel', 草果: 'black cardamom', 白胡椒粒: 'white peppercorn', 酸菜: 'sauerkraut', 辣椒: 'chili pepper', 啤酒: 'beer',
   牛肉: 'beef', 猪肉: 'pork', 猪肉末: 'ground pork', 牛肉末: 'ground beef', 鸡胸肉: 'chicken breast', 鸡腿肉: 'chicken thigh',
   白洋葱: 'white onion', 红洋葱: 'red onion', 洋葱: 'onion', 大蒜: 'garlic', 蒜: 'garlic', 老姜: 'ginger', 姜: 'ginger',
   蛋黄: 'egg yolk', 蛋白: 'egg white', 鸡蛋: 'egg', 番茄: 'tomato', 西红柿: 'tomato', 香菜: 'cilantro', 葱花: 'green onion',
@@ -9,23 +11,23 @@ const chineseFoods: Record<string, string> = {
   干辣椒: 'dried chili pepper', 干辣椒粉: 'chili powder', 黑胡椒: 'black pepper', 白胡椒粉: 'white pepper', 小茴香: 'cumin',
   牛奶: 'milk', 黄油: 'butter', 面粉: 'flour', 玉米淀粉: 'cornstarch', 水: 'water', 米粉: 'rice noodles', 豆腐: 'tofu',
 };
-const chineseUnits: Record<string, string> = { 千克: 'kg', 公斤: 'kg', 毫克: 'mg', 克: 'g', 毫升: 'ml', 公升: 'l', 升: 'l', 磅: 'lb', 盎司: 'oz', 大匙: 'tbsp', 小匙: 'tsp', 汤匙: 'tbsp', 茶匙: 'tsp', 勺: 'spoon', 个: 'each', 颗: 'piece', 片: 'slice', 头: 'head', 把: 'handful', 块: 'piece', 包: 'package', 瓶: 'bottle', 罐: 'can', 碗: 'bowl', 杯: 'cup' };
+const chineseUnits: Record<string, string> = { 小把: 'small handful', 圈: 'drizzle', 只: 'each', 千克: 'kg', 公斤: 'kg', 毫克: 'mg', 克: 'g', 毫升: 'ml', 公升: 'l', 升: 'l', 磅: 'lb', 盎司: 'oz', 大匙: 'tbsp', 小匙: 'tsp', 汤匙: 'tbsp', 茶匙: 'tsp', 勺: 'spoon', 个: 'each', 颗: 'piece', 片: 'slice', 头: 'head', 把: 'handful', 块: 'piece', 包: 'package', 瓶: 'bottle', 罐: 'can', 碗: 'bowl', 杯: 'cup' };
 
 export function normalizeIngredientText(input: string): string {
   let text = input.replace(/（/g, '(').replace(/）/g, ')').replace(/：/g, ':').replace(/，/g, ',')
     .replace(/【([^】]+)】/g, '[$1]').replace(/\[([^\]]+)\]\s*\(https?:\/\/[^)]+\)/g, '$1');
   // Chinese quantities can precede or follow a food name. Bare 勺 is deliberately
   // not translated to tablespoon: its size must be confirmed.
-  text = text.replace(/(?:[一二两三四五六七八九]?十[一二两三四五六七八九]?|[一二两三四五六七八九半])(?=\s*(?:到|至|千克|公斤|毫克|毫升|公升|盎司|大匙|小匙|汤匙|茶匙|克|升|磅|勺|个|颗|片|头|把|块|包|瓶|罐|碗|杯|整只|只))/g, n => {
+  text = text.replace(/(?:[一二两三四五六七八九]?十[一二两三四五六七八九]?|[一二两三四五六七八九半])(?=\s*(?:到|至|小把|圈|千克|公斤|毫克|毫升|公升|盎司|大匙|小匙|汤匙|茶匙|克|升|磅|勺|个|颗|片|头|把|块|包|瓶|罐|碗|杯|整只|只))/g, n => {
     if (!n.includes('十')) return chineseNumbers[n];
     const [tens, ones] = n.split('十');
     return String(Number(tens ? chineseNumbers[tens] : 1) * 10 + Number(ones ? chineseNumbers[ones] : 0));
   });
   text = text.replace(/(\d)\s*(?:到|至)\s*(\d)/g, '$1-$2');
-  text = text.replace(/(\d+(?:\.\d+|\/\d+)?(?:\s*-\s*\d+)?)\s*(千克|公斤|毫克|毫升|公升|盎司|大匙|小匙|汤匙|茶匙|克|升|磅|勺|个|颗|片|头|把|块|包|瓶|罐|碗|杯)/g, (_, n, unit) => `${n} ${chineseUnits[unit]} `);
-  const trailing = text.match(/^([^\d]+?)\s*(\d+(?:\.\d+|\/\d+)?(?:\s*-\s*\d+)?\s+(?:kg|mg|g|ml|l|lb|oz|tbsp|tsp|spoon|piece|each|slice|head|handful|package|bottle|can|bowl|cup))\s*(.*)$/);
+  text = text.replace(/(\d+(?:\.\d+|\/\d+)?(?:\s*-\s*\d+)?)\s*(小把|圈|只|千克|公斤|毫克|毫升|公升|盎司|大匙|小匙|汤匙|茶匙|克|升|磅|勺|个|颗|片|头|把|块|包|瓶|罐|碗|杯)/g, (_, n, unit) => `${n} ${chineseUnits[unit]} `);
+  const trailing = text.match(/^([^\d]+?)\s*(\d+(?:\.\d+|\/\d+)?(?:\s*-\s*\d+)?\s+(?:kg|mg|g|ml|l|lb|oz|tbsp|tsp|small handful|drizzle|spoon|piece|each|slice|head|handful|package|bottle|can|bowl|cup))\s*(.*)$/);
   if (trailing && /[\u4e00-\u9fff]/.test(trailing[1])) text = `${trailing[2]} ${trailing[1]} ${trailing[3]}`;
-  text = text.replace(/剥皮备用/g, 'peeled').replace(/适量/g, ' as needed ').replace(/切碎|切片|切块|剁碎/g, ' chopped ');
+  text = text.replace(/等按喜好/g, ' to taste ').replace(/剁成小块/g, ' chopped ').replace(/约/g, 'about ').replace(/剥皮备用/g, 'peeled').replace(/适量/g, ' as needed ').replace(/切碎|切片|切块|剁碎/g, ' chopped ');
   for (const [name, english] of Object.entries(chineseFoods).sort((a, b) => b[0].length - a[0].length)) {
     if (text.includes(name)) text = text.replaceAll(name, ` ${english} `);
   }
@@ -39,8 +41,48 @@ export function isIngredientHeading(line: string): boolean {
 /** Remove only recognized preparation phrases. Alternatives/marinades stay
  * visible so they cannot be silently discarded as if they were just a cut. */
 export function normalizeFoodText(input: string): string {
-  let food = input.toLowerCase().replace(/boneless and skinless/g, 'boneless skinless').replace(/\.$/, '').replace(/\b2%\s*milk\b/g, '2% milk');
-  food = food.replace(/,?\s*(?:cut|cuted|shred|shredded|slice|sliced)\s+into\s+(?:(?:small|large|big|thin|thick|1-inch|half-inch|1-2 inches|2 inches)\s+)*(?:pieces|cubes|strips|segments)\s*$/i, '')
+  let food = input.toLowerCase().replace(/boneless and skinless/g, 'boneless skinless').replace(/\.$/, '').replace(/shredded coconut/g, 'desiccated coconut').replace(/\b2%\s*milk\b/g, '2% milk');
+  food = food.replace(/,?\s*toasted and ground$/i, '')
+    .replace(/,?\s*cut into thin strips,?\s*rinse and drain$/i, '')
+    .replace(/,?\s*salt the water,?\s*boil about \d+ minutes,?\s*then drain$/i, '')
+    .replace(/,?\s*cut into [\d.-]+ inches?$/i, '')
+    .replace(/,?\s*leaves reserved for plating$/i, '')
+    .replace(/,?\s*soak in water for \d+ min(?:ute)?s? and diced$/i, '')
+    .replace(/\bwhole (?=(?:fish|heads?|green onions?)\b)/g, '')
+    .replace(/,?\s*(?:cut|cuted|shred|shredded|slice|sliced)\s+into\s+(?:(?:small|large|big|thin|thick|1-inch|half-inch|1-2 inches|2 inches)\s+)*(?:pieces|cubes|strips|segments)\s*$/i, '')
     .replace(/,?\s*mixed with water\s*$/i, '').replace(/,?\s*(?:sliced slightly on the thicker side|cut in half|mashed|smashed|toasted|chopped|diced|minced|finely chopped)\s*$/i, '');
   return food.replace(/\b(?:high-quality|ripe|barely ripe|ice cold|cold|fine|coarse)\b/g, '').replace(/\s+/g, ' ').trim();
+}
+
+/** Commas in weight/preparation parentheses are not ingredient separators. */
+export function splitOutsideParentheses(text: string): string[] {
+  let depth = 0; let start = 0; const parts: string[] = [];
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] === '(') depth++;
+    if (text[i] === ')') depth = Math.max(0, depth - 1);
+    if (text[i] === ',' && depth === 0) { parts.push(text.slice(start, i)); start = i + 1; }
+  }
+  parts.push(text.slice(start)); return parts;
+}
+
+/** Split only explicit multiple measured components. Keep one editor-row review
+ * so matching counts still describe the user's current list, not parser pieces. */
+export function ingredientComponents(line: string): { parts: string[]; note: string } | null {
+  if (/、/.test(line)) return { parts: normalizeIngredientText(line).replace(/to taste$/, '').split('、'), note: 'Including each named garnish component with estimated amounts.' };
+  if (/糍粑辣椒[:：]/.test(line)) {
+    const body = normalizeIngredientText(line).split(':').slice(1).join(':');
+    return { parts: body.split(/\s*\+\s*/), note: 'Dried chili blend: including the listed components using generic dried-chili references and assumed package sizes.' };
+  }
+  const marinade = line.match(/^(.*?),?\s+and marinate with\s+(.+)\.?$/i);
+  if (marinade) return { parts: [marinade[1], ...splitOutsideParentheses(marinade[2]).map(part => part.trim()).filter(Boolean)], note: 'Included the listed marinade ingredients as separate components.' };
+  const optional = line.match(/^optional:\s*(.+)$/i);
+  if (optional) return { parts: [splitOutsideParentheses(optional[1])[0]], note: 'Optional ingredient estimate: including the first listed option; other alternatives are not included.' };
+  const parts = line.split(/\s+and\s+(?=(?:\d|[¼½¾⅓⅔]|one\b|two\b|half\b))/i);
+  if (parts.length > 1 && parts.every(part => /^(?:\d|[¼½¾⅓⅔]|one\b|two\b|half\b)/i.test(part.trim()))) return { parts, note: 'Included each explicitly measured component in this row.' };
+  return null;
+}
+
+/** Structural/equipment rows have no nutrition, but remain visible in the editor. */
+export function isNutritionExcludedLine(line: string): boolean {
+  return isIngredientHeading(line) || /^\s*(?:a )?pot\/wok with a lid\s*$/i.test(line);
 }

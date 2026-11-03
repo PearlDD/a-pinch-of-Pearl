@@ -1,3 +1,4 @@
+import soup from '../src/lib/__tests__/fixtures/lemonOrzoSoup.json';
 import recipes from '../src/lib/__tests__/fixtures/publishedRecipes.json';
 import { test, expect } from '@playwright/test';
 
@@ -89,4 +90,28 @@ test('default estimates handle the exact published tuna recipe and strict mode c
   await page.getByLabel('Edit ingredient 1', { exact: true }).fill('110g dry spaghetti');
   await calculate();
   expect(parseFloat(await protein.inputValue())).toBeGreaterThan(parseFloat(original));
+});
+
+
+test('the screenshot soup calculates all 14 rows and refreshes estimates per serving', async ({ page, isMobile }) => {
+  await page.goto('/admin/recipes/new');
+  const button = page.getByRole('button', { name: 'Auto-calculate Nutrition' });
+  const calculate = () => isMobile ? button.tap() : button.click();
+  await expect(button).toBeVisible();
+  await page.getByLabel('Servings', { exact: true }).fill('6');
+  const pending = page.getByRole('textbox', { name: 'New ingredient', exact: true });
+  for (const line of soup.ingredients) { await pending.fill(line); await pending.press('Enter'); }
+  await calculate();
+  await expect(page.getByText(/14\/14 foods identified/)).toContainText('14/14 amounts resolved');
+  await expect(page.locator('p[role="alert"]')).toHaveCount(0);
+  for (const name of ['Calories', 'Carbohydrates', 'Protein', 'Fat', 'Fiber']) await expect(page.getByLabel(name, { exact: true })).not.toHaveValue('');
+  const carbs = page.getByLabel('Carbohydrates', { exact: true });
+  const original = parseFloat(await carbs.inputValue());
+  await page.locator('span[title="Click to edit"]').filter({ hasText: '1.5 cup uncooked orzo' }).click();
+  await page.getByLabel('Edit ingredient 11', { exact: true }).fill('2 cups uncooked orzo');
+  await calculate();
+  const changed = parseFloat(await carbs.inputValue()); expect(changed).toBeGreaterThan(original);
+  await page.getByLabel('Servings', { exact: true }).fill('3'); await calculate();
+  expect(Math.abs(parseFloat(await carbs.inputValue()) - changed * 2)).toBeLessThan(0.2);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
 });

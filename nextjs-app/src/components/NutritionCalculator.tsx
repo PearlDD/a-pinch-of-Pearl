@@ -38,7 +38,7 @@ export default function NutritionCalculator({ ingredients, servings, editorRef, 
       // Saving on blur can move this button between pointer-down and click.
       onPointerDown={event => event.preventDefault()}
       onClick={recalculate}>Auto-calculate Nutrition</button>
-    <label className={styles.hint} style={{ display: 'block', marginTop: '0.5rem' }}>
+    <label className={styles.policy}>
       <input type="checkbox" checked={estimateMissing} onChange={event => setEstimateMissing(event.target.checked)} />{' '}
       Estimate unclear amounts using standard portions (review assumptions)
     </label>
@@ -51,7 +51,7 @@ export default function NutritionCalculator({ ingredients, servings, editorRef, 
             {last.result.quantified}/{last.result.total} amounts resolved; {last.result.estimated} estimated.
           </p>
           <p className={styles.hint}>Food matching does not establish quantity accuracy. Values use approximate food references.{' '}{last.servingsNote}</p>
-          {last.result.ignoredLines.length > 0 && <p className={styles.hint}>Section headings excluded: {last.result.ignoredLines.join(', ')}</p>}
+          {last.result.ignoredLines.length > 0 && <p className={styles.hint}>Headings/equipment excluded: {last.result.ignoredLines.join(', ')}</p>}
           <details open={!last.result.complete}>
             <summary>Review ingredient amounts and assumptions</summary>
             <ul className={styles.review}>
