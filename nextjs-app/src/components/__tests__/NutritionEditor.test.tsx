@@ -91,14 +91,15 @@ describe.each([['new', AddRecipePage], ['edit', EditRecipePage]] as const)('%s r
     await calculate(user);
     expect(screen.getByLabelText('Calories')).toHaveValue('~972 kcal');
   });
-  it('separates food matching from unresolved quantities and clears stale values on failure', async () => {
+  it('separates food matching from unresolved quantities and preserves every prior value on failure', async () => {
     const user = await seed(); await calculate(user);
     await user.click(screen.getByText('100g flour', { selector: 'span[title="Click to edit"]' }));
     await user.clear(screen.getByLabelText('Edit ingredient 1'));
     await user.type(screen.getByLabelText('Edit ingredient 1'), '¼ can tuna');
     await calculate(user);
-    for (const name of ['Calories', 'Protein', 'Carbohydrates', 'Fat', 'Fiber']) expect(screen.getByLabelText(name)).toHaveValue('');
-    expect(screen.getByRole('alert')).toHaveTextContent('Previous values have been cleared');
+    for (const [name, value] of [['Calories', '~364 kcal'], ['Protein', '10.3g'], ['Carbohydrates', '76.3g'], ['Fat', '1g'], ['Fiber', '2.7g']]) expect(screen.getByLabelText(name)).toHaveValue(value);
+    expect(screen.getByRole('alert')).toHaveTextContent('Existing nutrition values were kept');
+    expect(screen.getByRole('alert')).toHaveTextContent('have not been updated');
     expect(screen.getByText(/1\/1 foods identified/)).toHaveTextContent('0/1 amounts resolved');
     expect(screen.getByText(/Package sizes vary/)).toBeVisible();
     await user.click(screen.getByText('¼ can tuna', { selector: 'span[title="Click to edit"]' }));
@@ -108,7 +109,7 @@ describe.each([['new', AddRecipePage], ['edit', EditRecipePage]] as const)('%s r
     expect(screen.getByLabelText('Protein')).toHaveValue('7.2g');
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
-  it('updates fractional servings and shows invalid servings as an error instead of keeping old numbers', async () => {
+  it('updates fractional servings and preserves prior results and reports that invalid servings were not calculated', async () => {
     const user = await seed(); await calculate(user);
     await user.clear(screen.getByLabelText('Servings'));
     await user.type(screen.getByLabelText('Servings'), '0.5');
@@ -118,17 +119,37 @@ describe.each([['new', AddRecipePage], ['edit', EditRecipePage]] as const)('%s r
     await user.type(screen.getByLabelText('Servings'), '2-4');
     await calculate(user);
     expect(screen.getByRole('alert')).toHaveTextContent('positive serving count');
-    expect(screen.getByLabelText('Calories')).toHaveValue('');
+    expect(screen.getByRole('alert')).toHaveTextContent('have not been updated');
+    expect(screen.getByLabelText('Calories')).toHaveValue('~728 kcal');
   });
   it('allows recalculation after removing everything and includes the first pending item', async () => {
     const user = await seed(); await calculate(user);
     await user.click(screen.getByRole('button', { name: 'Remove ingredient 1' }));
     await calculate(user);
     expect(screen.getByRole('alert')).toHaveTextContent('Add at least one ingredient');
-    expect(screen.getByLabelText('Calories')).toHaveValue('');
+    expect(screen.getByRole('alert')).toHaveTextContent('have not been updated');
+    expect(screen.getByLabelText('Calories')).toHaveValue('~364 kcal');
     await user.type(screen.getByRole('textbox', { name: 'New ingredient' }), '100g flour');
     await calculate(user);
     expect(screen.getByLabelText('Calories')).toHaveValue('~364 kcal');
+  });
+  it('keeps manually entered values through repeated failed attempts, including later manual changes', async () => {
+    const user = await seed();
+    const values = { Calories: '~321 kcal', Protein: '12.3g', Carbohydrates: '45g', Fat: '8g', Fiber: '6g' };
+    for (const [name, value] of Object.entries(values)) await user.type(screen.getByLabelText(name), value);
+    await user.type(screen.getByRole('textbox', { name: 'New ingredient' }), '1 cup xyzfood');
+    await calculate(user); await calculate(user);
+    for (const [name, value] of Object.entries(values)) expect(screen.getByLabelText(name)).toHaveValue(value);
+    expect(screen.getByRole('alert')).toHaveTextContent('have not been updated');
+    await user.clear(screen.getByLabelText('Protein')); await user.type(screen.getByLabelText('Protein'), '15g');
+    await calculate(user);
+    expect(screen.getByLabelText('Protein')).toHaveValue('15g');
+    // Correcting the list allows a subsequent success to replace every field.
+    await user.click(screen.getByRole('button', { name: 'Remove ingredient 2' }));
+    await calculate(user);
+    expect(screen.getByLabelText('Calories')).toHaveValue('~364 kcal');
+    expect(screen.getByLabelText('Protein')).toHaveValue('10.3g');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
   it('preserves Escape cancellation and saves the current list including pending additions', async () => {
     const user = await seed();
@@ -160,4 +181,17 @@ it('does not reload stale saved ingredients when the same admin session refreshe
   await user.click(screen.getByRole('button', { name: 'Auto-calculate Nutrition' }));
   expect(query.single).toHaveBeenCalledTimes(1);
   expect(screen.getByLabelText('Calories')).toHaveValue('~728 kcal');
+});
+
+
+it('keeps saved nutrition loaded in the edit form when the first calculation fails', async () => {
+  (useAuth as jest.Mock).mockReturnValue({ user: { id: 'admin' }, loading: false });
+  const saved = { name: 'Saved recipe', category: 'Main Dish', servings: '1', ingredients: '1 cup xyzfood', calories: '~298 kcal', carbs: '26g', protein: '29g', fat: '8g', fiber: '2g' };
+  const query = { ...mockSupabase.from(), single: jest.fn().mockResolvedValue({ data: saved, error: null }) };
+  mockSupabase.from.mockReturnValue(query);
+  const user = userEvent.setup(); render(<EditRecipePage />);
+  await screen.findByRole('button', { name: 'Auto-calculate Nutrition' });
+  await user.click(screen.getByRole('button', { name: 'Auto-calculate Nutrition' }));
+  for (const [name, value] of [['Calories', saved.calories], ['Carbohydrates', saved.carbs], ['Protein', saved.protein], ['Fat', saved.fat], ['Fiber', saved.fiber]]) expect(screen.getByLabelText(name)).toHaveValue(value);
+  expect(screen.getByRole('alert')).toHaveTextContent('have not been updated');
 });

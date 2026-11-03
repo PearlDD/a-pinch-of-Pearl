@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type RefObject } from 'react';
-import { calculateNutrition, EMPTY_NUTRITION, resolveNutritionServings, type NutritionResult, type NutritionValues } from '@/lib/nutritionCalculator';
+import { calculateNutrition, resolveNutritionServings, type NutritionResult, type NutritionValues } from '@/lib/nutritionCalculator';
 import type { ListInputHandle } from './ListInput';
 import styles from './NutritionCalculator.module.css';
 
@@ -24,11 +24,14 @@ export default function NutritionCalculator({ ingredients, servings, editorRef, 
       const count = serving.count;
       const result = calculateNutrition(current, count, { estimateMissing });
       setLast({ result, snapshot: JSON.stringify({ ingredients: current, servings, estimateMissing }), draft: draftVersion, servingsNote: serving.note });
-      onCalculated(result);
-      if (!result.complete) setError('Nutrition could not be calculated for the complete recipe. Resolve the items below and recalculate. Previous values have been cleared.');
+      // A failed attempt is diagnostic only: do not replace saved/manual inputs
+      // with the calculator's empty incomplete-result fields.
+      if (result.complete) onCalculated(result);
+      else setError('Nutrition could not be calculated for the complete recipe. Existing nutrition values were kept and have not been updated by this calculation. Resolve the items below and recalculate.');
     } catch (err) {
-      setLast(null); onCalculated({ ...EMPTY_NUTRITION });
-      setError(err instanceof Error ? err.message : 'Nutrition calculation failed. Please check the ingredient amounts.');
+      setLast(null);
+      const reason = err instanceof Error ? err.message : 'Nutrition calculation failed. Please check the ingredient amounts.';
+      setError(`${reason} Existing nutrition values were kept and have not been updated by this calculation.`);
     }
   };
 
