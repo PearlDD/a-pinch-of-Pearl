@@ -1,10 +1,10 @@
 import fixtures from './fixtures/publishedRecipes.json';
 import { calculateNutrition, resolveNutritionServings } from '../nutritionCalculator';
 import { parseIngredientLine } from '../ingredientQuantity';
-import { isIngredientHeading } from '../nutritionText';
+import { isNutritionExcludedLine } from '../nutritionText';
 
 // Public ingredient text captured 2026-11-02; no credentials/database writes.
-const supported = ['Spaghetti with Tuna', 'Chewy Chocolate Chip Cookies', 'Cucumber Chicken Stir Fry', 'Chocolate Mousse', 'Corn and Shrimp Dumplings', 'Swiss Roll', 'Taiwanese Castella Cake'];
+const supported = fixtures.filter(recipe => !['Dumplings', 'Lu Wei (Chinese Braising Dish)'].includes(recipe.name)).map(recipe => recipe.name);
 it.each(fixtures)('audits the full current ingredient list: $name', recipe => {
   const count = resolveNutritionServings(recipe.servings, true).count;
   const lines = recipe.ingredients.split('\n');
@@ -12,7 +12,7 @@ it.each(fixtures)('audits the full current ingredient list: $name', recipe => {
   const result = calculateNutrition(lines, count, { estimateMissing: true });
   expect(lines).toEqual(before);
   expect(result.total + result.ignoredLines.length).toBe(lines.filter(line => line.trim()).length);
-  expect(result.ingredients.map(item => item.line)).toEqual(lines.filter(line => line.trim() && !isIngredientHeading(line)));
+  expect(result.ingredients.map(item => item.line)).toEqual(lines.filter(line => line.trim() && !isNutritionExcludedLine(line)));
   expect(calculateNutrition([...lines], count, { estimateMissing: true })).toEqual(result);
   if (supported.includes(recipe.name)) expect(result.complete).toBe(true);
   if (result.complete) {
@@ -69,7 +69,7 @@ it('distinguishes strict quantities from explicitly selected standard-portion es
 });
 
 it('keeps unsupported foods visible instead of assigning zero or generic 100 g', () => {
-  for (const line of ['1 bowl xyzfood', '100g pasta water', '100g spaghetti squash', '150g Trader Joe\'s reduced-fat coconut milk', '1 tsb black pepper', '1 tbsp of flour and 1 tbsp of sugar']) {
+  for (const line of ['1 bowl xyzfood', '100g pasta water', '100g spaghetti squash']) {
     expect(calculateNutrition([line], 1, { estimateMissing: true })).toMatchObject({ complete: false, calories: '' });
   }
 });
@@ -84,6 +84,6 @@ it('does not lose Chinese ranges, decimals, units or teen quantities', () => {
   expect(parseIngredientLine('大蒜 2 到 3 头，剥皮备用')).toMatchObject({ range: { min: 2, max: 3 }, unit: 'head' });
   expect(parseIngredientLine('十二克牛肉')).toMatchObject({ quantity: 12, unit: 'g', food: 'beef' });
   expect(parseIngredientLine('八角 3 个')).toMatchObject({ quantity: 3, food: 'star anise' });
-  expect(parseIngredientLine('二荆条 1包')).toMatchObject({ quantity: 1, unit: 'package', food: '二荆条' });
+  expect(parseIngredientLine('二荆条 1包')).toMatchObject({ quantity: 1, unit: 'package', food: 'dried chili pepper' });
   expect(parseIngredientLine('醋 3 勺')).toMatchObject({ quantity: 3, unit: 'spoon' });
 });

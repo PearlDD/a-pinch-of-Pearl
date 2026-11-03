@@ -1,11 +1,33 @@
+import { EXTRA_HOUSEHOLD_MEASURES } from './nutritionExtraReferences';
+
 /** USDA SR28 WEIGHT.txt, grams per household measure, edible portions.
  * https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip
  * Only ingredient-specific measures are used; conversions remain estimates.
  */
 export const HOUSEHOLD_MEASURES: Record<string, { sr?: string; source?: string; volume: Record<number, number> }> = {
+  ...EXTRA_HOUSEHOLD_MEASURES,
+  'salt and pepper': { source: 'Estimated bulk weight for the disclosed salt/pepper blend; mixing ratios vary', volume: { 5: 5 } },
+  'dried chili pepper': { source: 'Loose dried chilies household estimate; packing and shape vary', volume: { 240: 35 } },
+  'light coconut milk': { source: 'Liquid density estimated as 1 g/ml; product labels vary', volume: { 240: 240 } },
+  'coconut creamer': { source: 'Liquid density estimated as 1 g/ml; sugar and fat vary by brand/flavor', volume: { 15: 15 } },
+  'rock sugar': { source: 'Crushed rock sugar estimated using granulated sugar bulk weight; whole crystals vary', volume: { 240: 200 } },
+  'whole buttermilk': { source: 'Whole cultured buttermilk; liquid approximation', volume: { 240: 245 } },
+  'chili bean paste': { source: 'Fermented paste household estimate; brand density varies', volume: { 15: 17 } },
+  'chinese sausage': { source: 'Diced sausage household estimate; cut and packing vary', volume: { 240: 140 } },
+  'ground pork': { source: 'Raw ground meat household estimate; packing varies', volume: { 240: 225 } },
+  'kimchi': { source: 'Fermented cabbage household proxy; draining varies', volume: { 240: 150 } },
+  'gochujang': { source: 'Miso household-weight proxy USDA SR16112; brand density varies', volume: { 15: 17 } },
+  'gochugaru': { source: 'Ground chili household-weight proxy USDA SR02031', volume: { 5: 1.8 } },
+  'sichuan peppercorn': { source: 'Whole peppercorn household-weight proxy USDA SR02030', volume: { 5: 2.9 } },
+  'thai basil': { source: 'Chopped basil household reference USDA SR02044', volume: { 15: 2.65 } },
+  'thai chili': { source: 'Chopped fresh hot chili reference USDA SR11819', volume: { 240: 150 } },
+  'red pepper flakes': { source: 'Ground chili household-weight proxy USDA SR02031; flakes vary', volume: { 5: 1.8 } },
   // Manufacturer household weight; macro values remain the generic chia reference.
   'chia seeds': { source: "Bob's Red Mill organic chia label (2 tbsp = 26 g)", volume: { 15: 13 } },
   'chia': { source: "Bob's Red Mill organic chia label (2 tbsp = 26 g)", volume: { 15: 13 } },
+  'dry orzo': { source: 'San Giorgio orzo label: 1/3 cup dry = 56 g; generic dry wheat pasta macros', volume: { 240: 168 } },
+  'cooked orzo': { source: 'Small cooked pasta proxy; shape and water absorption vary', volume: { 240: 140 } },
+  'italian seasoning': { source: 'Dried herb blend proxy using USDA SR 02027 oregano leaves', volume: { 5: 1 } },
   'vanilla extract': { sr: '02050', volume: { 5: 4.2, 15: 13, 240: 208 } },
   'vanilla': { sr: '02050', volume: { 5: 4.2, 15: 13, 240: 208 } },
   'cinnamon': { sr: '02010', volume: { 5: 2.6, 15: 7.8 } },
@@ -40,10 +62,12 @@ export const HOUSEHOLD_MEASURES: Record<string, { sr?: string; source?: string; 
 // FDA RACC portion references, rather than a universal 100 g fallback.
 // https://www.fda.gov/media/102587/download
 export const STANDARD_PORTIONS: Record<string, number> = {
-  'dry pasta': 55, 'cooked pasta': 140,
+  'dumpling wrappers': 55, 'dry pasta': 55, 'cooked pasta': 140, 'dry orzo': 55, 'cooked orzo': 140,
+  'raw chicken breast': 85, 'raw chicken thigh': 85,
   'chicken breast': 85, 'chicken thigh': 85, 'beef': 85, 'ground beef': 85,
   'pork': 85, 'ground pork': 85, 'shrimp': 85, 'fish': 85, 'tuna': 85, 'canned tuna': 85,
   'tofu': 85, 'firm tofu': 85, 'silken tofu': 85,
+  'sauerkraut': 30, 'orange peel': 1, 'chili bean paste': 17, 'beef broth': 240, 'beef stock': 240,
   'spinach': 85, 'mushroom': 85, 'mushrooms': 85, 'broccoli': 85, 'carrot': 85,
   'rice': 140, 'white rice': 140, 'cooked rice': 140, 'cooked white rice': 140,
   'rice noodles': 140, 'glass noodles': 55,

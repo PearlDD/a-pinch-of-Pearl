@@ -1,4 +1,4 @@
-import { normalizeIngredientText } from './nutritionText';
+import { normalizeIngredientText, splitOutsideParentheses } from './nutritionText';
 
 // Parsing is deliberately separate from food matching: a known food is not a
 // known amount. Missing/ambiguous amounts must never default to 100 g.
@@ -7,7 +7,7 @@ const fractions: Record<string, string> = { '¼': '1/4', '½': '1/2', '¾': '3/4
 export const MASS_UNITS: Record<string, number> = { g: 1, gram: 1, grams: 1, kg: 1000, kilogram: 1000, kilograms: 1000, mg: 0.001, milligram: 0.001, milligrams: 0.001, oz: 28.35, ounce: 28.35, ounces: 28.35, lb: 453.6, lbs: 453.6, pound: 453.6, pounds: 453.6 };
 export const VOLUME_ML: Record<string, number> = { ml: 1, milliliter: 1, milliliters: 1, millilitre: 1, millilitres: 1, l: 1000, liter: 1000, liters: 1000, litre: 1000, litres: 1000, cup: 240, cups: 240, c: 240, tbsp: 15, tablespoon: 15, tablespoons: 15, tbs: 15, tsp: 5, teaspoon: 5, teaspoons: 5, 'fl oz': 30, 'fluid ounce': 30, 'fluid ounces': 30, pint: 480, pints: 480, pt: 480, quart: 960, quarts: 960, qt: 960, gallon: 3840, gallons: 3840, gal: 3840 };
 export const CONTAINERS = new Set(['can', 'cans', 'tin', 'tins', 'jar', 'jars', 'package', 'packages', 'pkg', 'packet', 'packets', 'box', 'boxes', 'bag', 'bags', 'block', 'blocks']);
-const otherUnits = ['each', 'portion', 'portions', 'serving', 'servings', 'bowl', 'bowls', 'spoon', 'spoons', 'bottle', 'bottles', 'handful', 'handfuls', 'bunch', 'bunches', 'scoop', 'scoops', 'some', 'few', 'several', 'splash', 'splashes', 'drizzle', 'piece', 'pieces', 'slice', 'slices', 'clove', 'cloves', 'fillet', 'fillets', 'stalk', 'stalks', 'sprig', 'sprigs', 'pinch', 'pinches', 'dash', 'dashes', 'stick', 'sticks', 'head', 'heads', 'leaf', 'leaves', 'strip', 'strips', 'link', 'links', 'sheet', 'sheets', 'wrapper', 'wrappers', 'breast', 'breasts', 'thigh', 'thighs', 'wing', 'wings', 'drumstick', 'drumsticks'];
+const otherUnits = ['tsb', 'each', 'portion', 'portions', 'serving', 'servings', 'bowl', 'bowls', 'spoon', 'spoons', 'bottle', 'bottles', 'handful', 'handfuls', 'bunch', 'bunches', 'scoop', 'scoops', 'some', 'few', 'several', 'splash', 'splashes', 'drizzle', 'piece', 'pieces', 'slice', 'slices', 'clove', 'cloves', 'fillet', 'fillets', 'stalk', 'stalks', 'sprig', 'sprigs', 'pinch', 'pinches', 'dash', 'dashes', 'stick', 'sticks', 'head', 'heads', 'leaf', 'leaves', 'strip', 'strips', 'link', 'links', 'sheet', 'sheets', 'wrapper', 'wrappers', 'breast', 'breasts', 'thigh', 'thighs', 'wing', 'wings', 'drumstick', 'drumsticks'];
 const units = [...Object.keys(MASS_UNITS), ...Object.keys(VOLUME_ML), ...CONTAINERS, ...otherUnits].sort((a, b) => b.length - a.length);
 const unitPattern = new RegExp(`^(${units.join('|')})\\.?(?=\\s|,|$)[,\\s]*`, 'i');
 const massPattern = new RegExp(`(${NUMBER})\\s*(${Object.keys(MASS_UNITS).sort((a, b) => b.length - a.length).join('|')})\\b`, 'i');
@@ -45,7 +45,7 @@ export function parseIngredientLine(input: string): ParsedIngredient {
   if (foodFirst) {
     const [, food, amount] = foodFirst;
     if (/^(?:[\d.¼½¾]|a |an |one |two |three |half |quarter |about )/.test(amount)) {
-      const [measure, ...preparation] = amount.split(',');
+      const [measure, ...preparation] = splitOutsideParentheses(amount);
       line = `${measure} ${food}${preparation.length ? ', ' + preparation.join(',') : ''}`;
     }
     else if (/^(?:to taste|as needed)$/.test(amount)) line = `${food} ${amount}`;
@@ -58,7 +58,7 @@ export function parseIngredientLine(input: string): ParsedIngredient {
   line = line.replace(/^(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a|an)\b/, word => wordNumbers[word]);
   // Recognize amounts in parentheses without discarding them as preparation notes.
   const parentheses = [...line.matchAll(/\(([^)]*)\)/g)].map(match => match[1]);
-  const weightText = parentheses.find(text => massPattern.test(text));
+  const weightText = parentheses.find(text => massPattern.test(text) && !/\b(?:ratio|cut|soak|bake|boil)\b/.test(text));
   const beforeWeight = weightText ? line.slice(0, line.indexOf(`(${weightText})`)).trim() : '';
   const mass = weightText?.match(massPattern);
   const weight = mass && parseQuantity(mass[1]) !== null ? parseQuantity(mass[1])! * MASS_UNITS[mass[2]] : null;
@@ -94,7 +94,7 @@ export function parseIngredientLine(input: string): ParsedIngredient {
     packageWeight = parseQuantity(pack[1])! * MASS_UNITS[pack[2]];
     unit = pack[3]; line = line.slice(pack[0].length);
   } else {
-    line = line.replace(/^(?:small|medium|large|big|whole)\s+(?=(?:piece|slice|stalk|head|bowl|handful)\b)/, '');
+    line = line.replace(/^(?:small|medium|large|big|whole)\s+(?=(?:piece|slice|stalk|head|bowl|handful)s?\b)/, '');
     const unitMatch = line.match(unitPattern);
     if (unitMatch) { unit = unitMatch[1]; line = line.slice(unitMatch[0].length); }
   }
