@@ -208,6 +208,8 @@ export default function EditRecipePage() {
       return;
     }
 
+    // Clear prefetched public recipe payloads after a successful save.
+    router.refresh();
     router.push('/admin');
   };
 
